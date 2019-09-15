@@ -148,7 +148,7 @@ hypr <- function(..., terms = NULL) {
 #' @param value Hypothesis matrix
 #'
 #' @export
-hmat <- function(x, ...) function(x) MASS::as.fractions(x@hmat)
+hmat <- function(x) MASS::as.fractions(x@hmat)
 
 #' @describeIn hmat Set hypothesis matrix
 #' @export
