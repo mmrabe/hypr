@@ -47,8 +47,8 @@ as.numeric.expr_num <- function(x) {
 }
 
 as.fractions.expr_num <- function(x) {
-  if(is(x, "expr_frac")) as.fractions(x@num)/as.fractions(x@den)
-  else as.fractions(x@num)
+  if(is(x, "expr_frac")) MASS::as.fractions(x@num)/MASS::as.fractions(x@den)
+  else MASS::as.fractions(x@num)
 }
 
 setMethod("as.numeric", signature(x="expr_num"), as.numeric.expr_num)

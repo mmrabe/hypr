@@ -29,9 +29,9 @@ setMethod(show, "hypr", function(object) {
       cat("\n")
     }
     cat("\nHypothesis matrix:\n")
-    show(as.fractions(object@hmat))
+    show(MASS::as.fractions(object@hmat))
     cat("\nContrast matrix:\n")
-    show(as.fractions(object@cmat))
+    show(MASS::as.fractions(object@cmat))
   }
 })
 
@@ -148,7 +148,7 @@ hypr <- function(..., terms = NULL) {
 #' @param value Hypothesis matrix
 #'
 #' @export
-hmat <- function(x, ...) function(x) as.fractions(x@hmat)
+hmat <- function(x, ...) function(x) MASS::as.fractions(x@hmat)
 
 #' @describeIn hmat Set hypothesis matrix
 #' @export
@@ -181,11 +181,11 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
   if(add_intercept && remove_intercept) {
     stop("Cannot add and remove intercept at the same time!")
   } else if(add_intercept) {
-    as.fractions(cbind(1, x@cmat))
+    MASS::as.fractions(cbind(1, x@cmat))
   } else if(remove_intercept) {
-    as.fractions(x@cmat[,-1,drop=F])
+    MASS::as.fractions(x@cmat[,-1,drop=F])
   } else {
-    as.fractions(x@cmat)
+    MASS::as.fractions(x@cmat)
   }
 }
 
