@@ -15,16 +15,17 @@ setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 #' @export
 setMethod(show, "hypr", function(object) {
   if(length(object@eqs) == 0) {
-    cat("This object does not contain hypotheses.")
+    cat("This hypr object does not contain hypotheses.")
   } else {
     if(length(object@eqs) == 1) {
-      cat("1 null hypotheses:")
+      cat("hypr object containing one (1) null hypothesis:")
     } else {
-      cat(sprintf("%d null hypotheses:", length(object@eqs)))
+      cat(sprintf("hypr object containing %d null hypotheses:", length(object@eqs)))
     }
     cat("\n")
+    eq.names <- sprintf("H0.%s", if(is.null(names(object@eqs))) seq_along(object@eqs) else names(object@eqs))
     for(i in seq_along(object@eqs)) {
-      cat(sprintf("% 3d: 0 = ", i))
+      cat(sprintf("%*s: 0 = ", max(nchar(eq.names)), eq.names[i]))
       show(object@eqs[[i]])
       cat("\n")
     }
@@ -51,6 +52,16 @@ parse_hypothesis <- function(expr, valid_terms = NULL) {
   ret
 }
 
+check_names <- function(nvec) {
+  if(is.null(nvec)) {
+    TRUE
+  } else if(is.character(nvec)) {
+    all(grepl("^[a-zA-Z_][a-zA-Z0-9_]*$", nvec))
+  } else {
+    FALSE
+  }
+}
+
 #' Shorthand versions for simple hypothesis translation
 #'
 #' @param eqs A list() of equations
@@ -64,7 +75,13 @@ eqs2hmat <- function(eqs, terms = NULL) {
   if(is.null(terms)) {
     terms <- unique(unlist(lapply(eqs, function(h) unlist(lapply(h, function(x) x@var)))))
   }
-  as.matrix(vapply(seq_along(eqs), function(i) {
+  if(!is.list(eqs) || !all(vapply(eqs, function(x) is(x, "expr_sum"), logical(1)))) {
+    stop("`eqs` must be a list of expr_sums!")
+  }
+  if(!check_names(names(eqs))) {
+    stop("If equations are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+  }
+  ret <- as.matrix(vapply(seq_along(eqs), function(i) {
     vapply(terms, function(j) {
       for(el in eqs[[i]]) {
         if(setequal_exact(el@var, j)) {
@@ -74,6 +91,9 @@ eqs2hmat <- function(eqs, terms = NULL) {
       return(0)
     }, double(1))
   }, double(length(terms))))
+  rownames(ret) <- terms
+  colnames(ret) <- names(eqs)
+  ret
 }
 
 #' @describeIn eqs2hmat Convert null hypothesis equations to contrast matrix
@@ -83,23 +103,32 @@ eqs2cmat <- function(eqs) hmat2cmat(eqs2hmat(eqs))
 #' @describeIn eqs2hmat Convert hypothesis matrix to contrast matrix
 #' @export
 hmat2cmat <- function(hmat) {
+  if(!check_names(colnames(hmat))) {
+    stop("If hypothesis matrix columns are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+  }
   cmat <- round(MASS::ginv(t(hmat)), 8)
-  rownames(cmat) <- rownames(hmat)
+  dimnames(cmat) <- dimnames(hmat)
   cmat
 }
 
 #' @describeIn eqs2hmat Convert contrast matrix to hypothesis matrix
 #' @export
 cmat2hmat <- function(cmat) {
+  if(!check_names(colnames(hmat))) {
+    stop("If contrast matrix columns are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+  }
   hmat <- round(t(MASS::ginv(cmat)), 8)
-  rownames(hmat) <- rownames(cmat)
+  dimnames(hmat) <- dimnames(cmat)
   hmat
 }
 
 #' @describeIn eqs2hmat Convert hypothesis matrix to null hypothesis equations
 #' @export
 hmat2eqs <- function(hmat, as_fractions = TRUE) {
-  lapply(seq_len(ncol(hmat)), function(j) {
+  if(!check_names(colnames(hmat))) {
+    stop("If hypothesis matrix columns are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+  }
+  ret <- lapply(seq_len(ncol(hmat)), function(j) {
     simplify_expr_sum(
       as(lapply(seq_len(nrow(hmat)), function(i) {
         if(as_fractions) {
@@ -112,6 +141,8 @@ hmat2eqs <- function(hmat, as_fractions = TRUE) {
       }), "expr_sum")
     )
   })
+  names(ret) <- colnames(hmat)
+  ret
 }
 
 #' @describeIn eqs2hmat Convert contrast matrix to null hypothesis equations
