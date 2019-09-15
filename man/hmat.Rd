@@ -5,7 +5,7 @@
 \alias{hmat<-}
 \title{Retrieve or set hypothesis matrix}
 \usage{
-hmat(x, ...)
+hmat(x)
 
 hmat(x) <- value
 }
