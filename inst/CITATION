@@ -1,0 +1,13 @@
+
+bibentry(
+  bibtype = "Article",
+  title = "How to capitalize on a priori contrasts in linear (mixed) models: A tutorial",
+  year = 2019,
+  journal = "Journal of Memory and Language",
+  author = c(
+    person(given = "Daniel", family = "Schad"),
+    person(given = "Shravan", family = "Vasishth"),
+    person(given = "Sven", family = "Hohenstein"),
+    person(given = "Reinhold", family = "Kliegl")
+  )
+)
