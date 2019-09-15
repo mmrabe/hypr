@@ -56,7 +56,7 @@ check_names <- function(nvec) {
   if(is.null(nvec)) {
     TRUE
   } else if(is.character(nvec)) {
-    all(grepl("^[a-zA-Z_][a-zA-Z0-9_]*$", nvec))
+    all(grepl("^[a-zA-Z][a-zA-Z0-9_.]*$|^\\.{1,2}([a-zA-Z_][a-zA-Z0-9._]*)?$|^\\.{3}[a-zA-Z0-9._]+$", nvec))
   } else {
     FALSE
   }
@@ -79,7 +79,7 @@ eqs2hmat <- function(eqs, terms = NULL) {
     stop("`eqs` must be a list of expr_sums!")
   }
   if(!check_names(names(eqs))) {
-    stop("If equations are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+    stop("If equations are named, all must be named and names must be valid variable names in R!")
   }
   ret <- as.matrix(vapply(seq_along(eqs), function(i) {
     vapply(terms, function(j) {
@@ -104,7 +104,7 @@ eqs2cmat <- function(eqs) hmat2cmat(eqs2hmat(eqs))
 #' @export
 hmat2cmat <- function(hmat) {
   if(!check_names(colnames(hmat))) {
-    stop("If hypothesis matrix columns are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+    stop("If hypothesis matrix columns are named, all must be named and names must be valid variable names in R!")
   }
   cmat <- round(MASS::ginv(t(hmat)), 8)
   dimnames(cmat) <- dimnames(hmat)
@@ -115,7 +115,7 @@ hmat2cmat <- function(hmat) {
 #' @export
 cmat2hmat <- function(cmat) {
   if(!check_names(colnames(hmat))) {
-    stop("If contrast matrix columns are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+    stop("If contrast matrix columns are named, all must be named and names must be valid variable names in R!")
   }
   hmat <- round(t(MASS::ginv(cmat)), 8)
   dimnames(hmat) <- dimnames(cmat)
@@ -126,7 +126,7 @@ cmat2hmat <- function(cmat) {
 #' @export
 hmat2eqs <- function(hmat, as_fractions = TRUE) {
   if(!check_names(colnames(hmat))) {
-    stop("If hypothesis matrix columns are named, all names must be at least one character long and contain only non-alphanumeric characters or underscores!")
+    stop("If hypothesis matrix columns are named, all must be named and names must be valid variable names in R!")
   }
   ret <- lapply(seq_len(ncol(hmat)), function(j) {
     simplify_expr_sum(
