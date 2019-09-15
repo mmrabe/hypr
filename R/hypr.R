@@ -212,7 +212,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
   class(value) <- setdiff(class(value), "fractions")
   x@cmat <- value
   x@hmat <- cmat2hmat(value)
-  x@eqs <- hmat2eqs(value)
+  x@eqs <- hmat2eqs(x@hmat)
   x
 }
 
