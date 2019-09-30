@@ -308,3 +308,19 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = FALS
     cmat(x = hypr(...), add_intercept = add_intercept, remove_intercept = remove_intercept)
   }
 }
+
+#' Nice generalized inverse
+#'
+#' This function calculates the generalized inverse of x, formats it as fractions and copies dimension names from the original matrix.
+#'
+#' @param x The original matrix
+#' @param as_fractions Whether to format the matrix as fractions (MASS package)
+#' @return Nice generalized inverse
+#' @seealso MASS::ginv()
+#'
+#' @export
+ginv2 <- function(x, as_fractions = TRUE) {
+  y <- MASS::ginv(x)
+  dimnames(y) <- dimnames(x)[2:1]
+  if(as_fractions) MASS::fractions(y) else y
+}
