@@ -10,7 +10,7 @@ NULL
 #'
 setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 
-#' @describeIn hypr Print summary of hypr object
+#' @describeIn hypr Show summary of hypr object
 #'
 #' @export
 setMethod(show, "hypr", function(object) {
@@ -29,10 +29,10 @@ setMethod(show, "hypr", function(object) {
       show(object@eqs[[i]])
       cat("\n")
     }
-    cat("\nHypothesis matrix:\n")
-    show(MASS::as.fractions(object@hmat))
+    cat("\nHypothesis matrix (transposed):\n")
+    show(thmat(object))
     cat("\nContrast matrix:\n")
-    show(MASS::as.fractions(object@cmat))
+    show(cmat(object))
   }
 })
 
@@ -93,7 +93,7 @@ eqs2hmat <- function(eqs, terms = NULL) {
   }, double(length(terms))))
   rownames(ret) <- terms
   colnames(ret) <- names(eqs)
-  ret
+  t(ret)
 }
 
 #' @describeIn eqs2hmat Convert null hypothesis equations to contrast matrix
@@ -103,55 +103,77 @@ eqs2cmat <- function(eqs) hmat2cmat(eqs2hmat(eqs))
 #' @describeIn eqs2hmat Convert hypothesis matrix to contrast matrix
 #' @export
 hmat2cmat <- function(hmat) {
-  if(!check_names(colnames(hmat))) {
+  if(!check_names(rownames(hmat))) {
     stop("If hypothesis matrix columns are named, all must be named and names must be valid variable names in R!")
   }
-  cmat <- round(MASS::ginv(t(hmat)), 8)
-  dimnames(cmat) <- dimnames(hmat)
+  cmat <- MASS::ginv(hmat)
+  rownames(cmat) <- colnames(hmat)
+  colnames(cmat) <- rownames(hmat)
   cmat
 }
 
-#' @describeIn eqs2hmat Convert contrast matrix to hypothesis matrix
+#' @describeIn conversions Convert contrast matrix to hypothesis matrix
 #' @export
 cmat2hmat <- function(cmat) {
   if(!check_names(colnames(hmat))) {
     stop("If contrast matrix columns are named, all must be named and names must be valid variable names in R!")
   }
-  hmat <- round(t(MASS::ginv(cmat)), 8)
-  dimnames(hmat) <- dimnames(cmat)
+  hmat <- MASS::ginv(cmat)
+  rownames(hmat) <- colnames(cmat)
+  colnames(hmat) <- rownames(cmat)
   hmat
 }
 
-#' @describeIn eqs2hmat Convert hypothesis matrix to null hypothesis equations
+#' @describeIn conversions Convert hypothesis matrix to null hypothesis equations
 #' @export
 hmat2eqs <- function(hmat, as_fractions = TRUE) {
-  if(!check_names(colnames(hmat))) {
+  if(!check_names(rownames(hmat))) {
     stop("If hypothesis matrix columns are named, all must be named and names must be valid variable names in R!")
   }
-  ret <- lapply(seq_len(ncol(hmat)), function(j) {
+  ret <- lapply(seq_len(nrow(hmat)), function(j) {
     simplify_expr_sum(
-      as(lapply(seq_len(nrow(hmat)), function(i) {
+      as(lapply(seq_len(ncol(hmat)), function(i) {
         if(as_fractions) {
-          frac <- strsplit(attr(MASS::as.fractions(hmat[i,j]), "fracs"), "/", TRUE)[[1]]
+          frac <- strsplit(attr(MASS::as.fractions(hmat[j,i]), "fracs"), "/", TRUE)[[1]]
           num <- new("expr_frac", num = as.integer(frac[1]), den = if(length(frac)>1) as.integer(frac[2]) else 1L)
         } else {
-          num <- new("expr_real", num = hmat[i,j])
+          num <- new("expr_real", num = hmat[j,i])
         }
-        new("expr_coef", num = num, var = rownames(hmat)[i])
+        new("expr_coef", num = num, var = colnames(hmat)[i])
       }), "expr_sum")
     )
   })
-  names(ret) <- colnames(hmat)
+  names(ret) <- rownames(hmat)
   ret
 }
 
-#' @describeIn eqs2hmat Convert contrast matrix to null hypothesis equations
+#' @describeIn conversions Convert contrast matrix to null hypothesis equations
 #' @export
 cmat2eqs <- function(cmat) hmat2eqs(cmat2hmat(cmat))
 
 #' Create a hypr object
 #'
+#' Use this function to create hypr objects from null hypothesis equations. Each argument should be one equation. For example, a null hypothesis for the grand mean (GM), often used as the intercept, is usually coded as mu~0.
+#'
+#' You may call the function without any arguments. In that case, an empty hypr object is returned. This is useful if you want to derive equations from a known hypothesis matrix or contrast matrix.
+#'
 #' @param ... A list of null hypothesis equations
+#'
+#' @examples
+#'
+#' # Create an empty hypr object (no hypotheses):
+#' h <- hypr()
+#'
+#' # Treatment contrast:
+#' h <- hypr(mu1~0, mu2~mu1, mu3~mu1)
+#'
+#' cmat(h, remove_intercept = TRUE)
+#' contr.treatment(3)
+#'
+#' # This generates a similar hypr object:
+#' h <- hypr()
+#' cmat(h, add_intercept = TRUE) <- contr.treatment(c("mu1","mu2","mu3"))
+#' h
 #'
 #' @export
 hypr <- function(..., terms = NULL) {
@@ -181,6 +203,10 @@ hypr <- function(..., terms = NULL) {
 #' @export
 hmat <- function(x) MASS::as.fractions(x@hmat)
 
+#' @describeIn hmat Retrieve transposed hypothesis matrix
+#' @export
+thmat <- function(x) t(hmat(x))
+
 #' @describeIn hmat Set hypothesis matrix
 #' @export
 `hmat<-` <- function(x, value) {
@@ -191,6 +217,10 @@ hmat <- function(x) MASS::as.fractions(x@hmat)
   x
 }
 
+
+#' @describeIn hmat Set transposed hypothesis matrix
+#' @export
+`thmat<-` <- function(x, value) hmat(x) <- t(value)
 
 #' Retrieve the terms (variables) used in a hypr object
 #'

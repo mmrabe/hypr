@@ -2,12 +2,18 @@
 % Please edit documentation in R/hypr.R
 \name{hmat}
 \alias{hmat}
+\alias{thmat}
 \alias{hmat<-}
-\title{Retrieve or set hypothesis matrix}
+\alias{thmat<-}
+\title{Retrieve and set hypothesis matrix}
 \usage{
 hmat(x)
 
+thmat(x)
+
 hmat(x) <- value
+
+thmat(x) <- value
 }
 \arguments{
 \item{x}{A hypr object}
@@ -15,10 +21,14 @@ hmat(x) <- value
 \item{value}{Hypothesis matrix}
 }
 \description{
-Description
+Use these functions to retrieve or set a hypr object's hypothesis matrix. If used for updating, the contrast matrix and equations are derived automatically.
 }
 \section{Functions}{
 \itemize{
+\item \code{thmat}: Retrieve transposed hypothesis matrix
+
 \item \code{hmat<-}: Set hypothesis matrix
+
+\item \code{thmat<-}: Set transposed hypothesis matrix
 }}
 
