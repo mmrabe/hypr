@@ -1,13 +1,13 @@
 Package: hypr
 Type: Package
 Title: Hypr - Hypothesis matrix translation in R
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
-    person(given = "Daniel", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut")),
+    person(given = "Maximilian M.", family = "Rabe", email = "maximilian.rabe@uni-potsdam.de", role = c("aut","cre")),
     person(given = "Shravan", family = "Vasishth", role = c("aut")),
     person(given = "Sven", family = "Hohenstein", role = c("aut")),
     person(given = "Reinhold", family = "Kliegl", email = "kliegl@uni-potsdam.de", role = c("aut")),
-    person(given = "Maximilian M.", family = "Rabe", email = "marabe@uni-potsdam.de", role = c("aut","cre")))
+    person(given = "Daniel", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut")))
 Description: Hypr creates contrast matrices as used in linear regressions from experimental (null) hypotheses and vice versa.
 License: GPL-3
 Depends: R (>= 3.5.0)
