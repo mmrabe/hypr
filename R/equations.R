@@ -1,11 +1,17 @@
 
 setClass("expr_num")
+expr_num <- function(object) if(is(object, "expr_frac")) show.expr_frac(object) else if(is(object, "expr_real")) show.expr_real(object) else show(object)
+
 setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 0L, den = 1L), contains = "expr_num")
-setMethod("show", "expr_frac", function(object) if(object@den!=1L) cat(sprintf("%d/%d", object@num, object@den)) else cat(object@num))
+show.expr_frac <- function(object) if(object@den!=1L) cat(sprintf("%d/%d", object@num, object@den)) else cat(object@num)
+#setMethod("show", "expr_frac", show.expr_frac)
+
 setClass("expr_real", slots = c(num = "numeric"), prototype = list(num = 0), contains = "expr_num")
-setMethod("show", "expr_real", function(object) cat(object@num))
+show.expr_real <- function(object) cat(object@num)
+#setMethod("show", "expr_real", show.expr_real)
+
 setClass("expr_coef", slots = c(num = "expr_num", var = "character"))
-setMethod("show", "expr_coef", function(object) {
+show.expr_coef <- function(object) {
   if(as.numeric.expr_num(object@num) != 1 || length(object@var) == 0) {
     if(as.numeric.expr_num(object@num) == -1) {
       cat("-")
@@ -17,27 +23,30 @@ setMethod("show", "expr_coef", function(object) {
     }
   }
   cat(paste(object@var, collapse = "*"))
-})
+}
+#setMethod("show", "expr_coef", show.expr_coef)
+
 setClass("expr_sum", contains = "list")
-setMethod("show", "expr_sum", function(object) {
+show.expr_sum <- function(object) {
   if(length(object) > 0) {
     for(i in seq_along(object)) {
       if(i>1) {
         if(as.numeric.expr_num(object[[i]]@num) >= 0) {
           cat(" + ")
-          show(object[[i]])
+          show.expr_coef(object[[i]])
         } else {
           cat(" - ")
-          show(multiply_expr(object[[i]], new("expr_coef", num = new("expr_frac", num = -1L))))
+          show.expr_coef(multiply_expr(object[[i]], new("expr_coef", num = new("expr_frac", num = -1L))))
         }
       } else {
-        show(object[[i]])
+        show.expr_coef(object[[i]])
       }
     }
   } else {
     cat("0")
   }
-})
+}
+#setMethod("show", "expr_sum", show.expr_sum)
 
 
 as.numeric.expr_num <- function(x) {
@@ -51,7 +60,7 @@ as.fractions.expr_num <- function(x) {
   else MASS::as.fractions(x@num)
 }
 
-setMethod("as.numeric", signature(x="expr_num"), as.numeric.expr_num)
+#setMethod("as.numeric", signature(x="expr_num"), as.numeric.expr_num)
 #setMethod("as.fractions", signature(x="expr_num"), as.fractions.expr_num)
 
 `*.expr_num` <- function(a, b) {

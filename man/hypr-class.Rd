@@ -8,6 +8,9 @@
 \usage{
 \S4method{show}{hypr}(object)
 }
+\arguments{
+\item{object}{a hypr object}
+}
 \description{
 An object containing null hypotheses, a hypothesis matrix, and a contrast matrix
 }

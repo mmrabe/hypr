@@ -1,8 +1,11 @@
 #' @include equations.R
+#' @importFrom methods as is new show
 NULL
 
 
 #' An object containing null hypotheses, a hypothesis matrix, and a contrast matrix
+#'
+#' @param object a hypr object
 #'
 #' @slot eqs A list of null hypotheses
 #' @slot hmat A hypothesis matrix
@@ -245,6 +248,7 @@ setMethod("terms", signature(x="hypr"), function(x) rownames(hmat(x)))
 #' @param value contrast matrix
 #' @param add_intercept Add intercept column to contrast matrix
 #' @param remove_intercept Remove intercept column from contrast matrix
+#' @param ... A list of hypothesis equations for which to retrieve a contrast matrix
 #' @rdname cmat
 #'
 #' @export
@@ -266,7 +270,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
 
 #' @describeIn cmat Set contrast matrix
 #' @export
-`cmat<-` <- function(x, value, add_intercept = FALSE, remove_intercept = FALSE) {
+`cmat<-` <- function(x, add_intercept = FALSE, remove_intercept = FALSE, value) {
   if(!is.matrix(value)) {
     stop("`value` must be a contrast matrix!")
   }
@@ -301,7 +305,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
 contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = FALSE) {
   args <- list(...)
   if(length(args) == 1 && is.numeric(args[[1]])) {
-    contr.treatment(args[[1]])
+    stats::contr.treatment(args[[1]])
   } else if(length(args) == 1 && is(args[[1]], "hypr")) {
     cmat(x = args[[1]], add_intercept = add_intercept, remove_intercept = remove_intercept)
   } else {

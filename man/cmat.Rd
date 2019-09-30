@@ -20,6 +20,8 @@ contr.hypothesis(..., add_intercept = FALSE, remove_intercept = FALSE)
 \item{remove_intercept}{Remove intercept column from contrast matrix}
 
 \item{value}{contrast matrix}
+
+\item{...}{A list of hypothesis equations for which to retrieve a contrast matrix}
 }
 \description{
 Use these functions to retrieve or set a hypr object's contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
