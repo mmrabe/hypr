@@ -70,6 +70,7 @@ check_names <- function(nvec) {
 #' @param order_terms (optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)
 #' @param cmat A contrast matrix
 #' @param hmat A hypothesis matrix
+#' @param as_fractions Whether to output matrix using fractions formatting (MASS package)
 #' @return A list of equations (hmat2eqs and cmat2eqs), a contrast matrix (hmat2cmat, eqs2cmat), or a hypothesis matrix (cmat2hmat, eqs2hmat)
 #'
 NULL
@@ -107,30 +108,24 @@ eqs2hmat <- function(eqs, terms = NULL, order_terms = FALSE) {
 
 #' @describeIn conversions Convert null hypothesis equations to contrast matrix
 #' @export
-eqs2cmat <- function(eqs) hmat2cmat(eqs2hmat(eqs))
+eqs2cmat <- function(eqs, as_fractions = TRUE) hmat2cmat(eqs2hmat(eqs), as_fractions = as_fractions)
 
 #' @describeIn conversions Convert hypothesis matrix to contrast matrix
 #' @export
-hmat2cmat <- function(hmat) {
+hmat2cmat <- function(hmat, as_fractions = TRUE) {
   if(!check_names(rownames(hmat))) {
     stop("If hypothesis matrix columns are named, all must be named and names must be valid variable names in R!")
   }
-  cmat <- MASS::ginv(hmat)
-  rownames(cmat) <- colnames(hmat)
-  colnames(cmat) <- rownames(hmat)
-  cmat
+  ginv2(hmat, as_fractions = as_fractions)
 }
 
 #' @describeIn conversions Convert contrast matrix to hypothesis matrix
 #' @export
-cmat2hmat <- function(cmat) {
+cmat2hmat <- function(cmat, as_fractions = TRUE) {
   if(!check_names(colnames(hmat))) {
     stop("If contrast matrix columns are named, all must be named and names must be valid variable names in R!")
   }
-  hmat <- MASS::ginv(cmat)
-  rownames(hmat) <- colnames(cmat)
-  colnames(hmat) <- rownames(cmat)
-  hmat
+  ginv2(cmat, as_fractions = as_fractions)
 }
 
 #' @describeIn conversions Convert hypothesis matrix to null hypothesis equations
@@ -158,7 +153,7 @@ hmat2eqs <- function(hmat, as_fractions = TRUE) {
 
 #' @describeIn conversions Convert contrast matrix to null hypothesis equations
 #' @export
-cmat2eqs <- function(cmat) hmat2eqs(cmat2hmat(cmat))
+cmat2eqs <- function(cmat, as_fractions = TRUE) hmat2eqs(cmat2hmat(cmat), as_fractions = as_fractions)
 
 #' Create a hypr object
 #'
@@ -197,7 +192,7 @@ hypr <- function(..., terms = NULL, order_terms = FALSE) {
   }
   parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = terms, order_terms = order_terms)
   hmat <- eqs2hmat(parsed_hypotheses, terms = terms, order_terms = order_terms)
-  cmat <- hmat2cmat(hmat)
+  cmat <- hmat2cmat(hmat, as_fractions = FALSE)
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
 }
 
@@ -207,14 +202,15 @@ hypr <- function(..., terms = NULL, order_terms = FALSE) {
 #'
 #' @rdname hmat
 #' @param x A hypr object
+#' @param as_fractions Whether to format matrix as fractions (MASS package)
 #' @param value Hypothesis matrix
 #'
 #' @export
-hmat <- function(x) MASS::as.fractions(x@hmat)
+hmat <- function(x, as_fractions = TRUE) if(as_fractions) MASS::as.fractions(x@hmat) else x@hmat
 
 #' @describeIn hmat Retrieve transposed hypothesis matrix
 #' @export
-thmat <- function(x) t(hmat(x))
+thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions))
 
 #' @describeIn hmat Set hypothesis matrix
 #' @export
@@ -222,7 +218,7 @@ thmat <- function(x) t(hmat(x))
   class(value) <- setdiff(class(value), "fractions")
   x@hmat <- value
   x@eqs <- hmat2eqs(value)
-  x@cmat <- hmat2cmat(value)
+  x@cmat <- hmat2cmat(value, as_fractions = FALSE)
   x
 }
 
@@ -290,7 +286,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
   }
   class(value) <- setdiff(class(value), "fractions")
   x@cmat <- value
-  x@hmat <- cmat2hmat(value)
+  x@hmat <- cmat2hmat(value, as_fractions = FALSE)
   x@eqs <- hmat2eqs(x@hmat)
   x
 }
