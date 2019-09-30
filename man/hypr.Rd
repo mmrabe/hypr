@@ -10,5 +10,25 @@ hypr(..., terms = NULL)
 \item{...}{A list of null hypothesis equations}
 }
 \description{
-Create a hypr object
+Use this function to create hypr objects from null hypothesis equations. Each argument should be one equation. For example, a null hypothesis for the grand mean (GM), often used as the intercept, is usually coded as mu~0.
+}
+\details{
+You may call the function without any arguments. In that case, an empty hypr object is returned. This is useful if you want to derive equations from a known hypothesis matrix or contrast matrix.
+}
+\examples{
+
+# Create an empty hypr object (no hypotheses):
+h <- hypr()
+
+# Treatment contrast:
+h <- hypr(mu1~0, mu2~mu1, mu3~mu1)
+
+cmat(h, remove_intercept = TRUE)
+contr.treatment(3)
+
+# This generates a similar hypr object:
+h <- hypr()
+cmat(h, add_intercept = TRUE) <- contr.treatment(c("mu1","mu2","mu3"))
+h
+
 }

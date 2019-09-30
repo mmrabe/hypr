@@ -64,11 +64,16 @@ check_names <- function(nvec) {
 
 #' Shorthand versions for simple hypothesis translation
 #'
+#' @name conversions
 #' @param eqs A list() of equations
 #' @param terms (optional) A character vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)
 #' @param cmat A contrast matrix
 #' @param hmat A hypothesis matrix
 #' @return A list of equations (hmat2eqs and cmat2eqs), a contrast matrix (hmat2cmat, eqs2cmat), or a hypothesis matrix (cmat2hmat, eqs2hmat)
+#'
+NULL
+
+#' @describeIn conversions Convert null hypothesis equations to hypothesis matrix
 #'
 #' @export
 eqs2hmat <- function(eqs, terms = NULL) {
@@ -96,11 +101,11 @@ eqs2hmat <- function(eqs, terms = NULL) {
   t(ret)
 }
 
-#' @describeIn eqs2hmat Convert null hypothesis equations to contrast matrix
+#' @describeIn conversions Convert null hypothesis equations to contrast matrix
 #' @export
 eqs2cmat <- function(eqs) hmat2cmat(eqs2hmat(eqs))
 
-#' @describeIn eqs2hmat Convert hypothesis matrix to contrast matrix
+#' @describeIn conversions Convert hypothesis matrix to contrast matrix
 #' @export
 hmat2cmat <- function(hmat) {
   if(!check_names(rownames(hmat))) {
@@ -192,9 +197,9 @@ hypr <- function(..., terms = NULL) {
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
 }
 
-#' Retrieve or set hypothesis matrix
+#' Retrieve and set hypothesis matrix
 #'
-#' Description
+#' Use these functions to retrieve or set a hypr object's hypothesis matrix. If used for updating, the contrast matrix and equations are derived automatically.
 #'
 #' @rdname hmat
 #' @param x A hypr object
@@ -224,14 +229,15 @@ thmat <- function(x) t(hmat(x))
 
 #' Retrieve the terms (variables) used in a hypr object
 #'
-#' @param x
+#' @param x A hypr object
+#' @return A character vector of term names
 #'
 #' @export
 setMethod("terms", signature(x="hypr"), function(x) rownames(hmat(x)))
 
 #' Retrieve or set contrast matrix
 #'
-#' Description
+#' Use these functions to retrieve or set a hypr object's contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
 #'
 #' @param x A hypr object
 #' @param value contrast matrix

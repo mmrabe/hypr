@@ -8,7 +8,10 @@
 \S4method{terms}{hypr}(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{A hypr object}
+}
+\value{
+A character vector of term names
 }
 \description{
 Retrieve the terms (variables) used in a hypr object

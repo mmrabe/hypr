@@ -13,7 +13,7 @@ An object containing null hypotheses, a hypothesis matrix, and a contrast matrix
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print summary of hypr object
+\item \code{show}: Show summary of hypr object
 }}
 
 \section{Slots}{

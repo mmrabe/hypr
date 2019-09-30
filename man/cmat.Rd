@@ -18,7 +18,7 @@ contr.hypothesis(..., add_intercept = FALSE, remove_intercept = FALSE)
 \item{value}{contrast matrix}
 }
 \description{
-Description
+Use these functions to retrieve or set a hypr object's contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
 }
 \section{Functions}{
 \itemize{
