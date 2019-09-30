@@ -7,9 +7,9 @@
 \alias{thmat<-}
 \title{Retrieve and set hypothesis matrix}
 \usage{
-hmat(x)
+hmat(x, as_fractions = TRUE)
 
-thmat(x)
+thmat(x, as_fractions = TRUE)
 
 hmat(x) <- value
 
@@ -17,6 +17,8 @@ thmat(x) <- value
 }
 \arguments{
 \item{x}{A hypr object}
+
+\item{as_fractions}{Whether to format matrix as fractions (MASS package)}
 
 \item{value}{Hypothesis matrix}
 }

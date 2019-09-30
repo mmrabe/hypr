@@ -4,7 +4,7 @@
 \alias{hypr}
 \title{Create a hypr object}
 \usage{
-hypr(..., terms = NULL)
+hypr(..., terms = NULL, order_terms = FALSE)
 }
 \arguments{
 \item{...}{A list of null hypothesis equations}

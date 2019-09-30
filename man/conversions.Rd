@@ -10,22 +10,26 @@
 \alias{cmat2eqs}
 \title{Shorthand versions for simple hypothesis translation}
 \usage{
-eqs2hmat(eqs, terms = NULL)
+eqs2hmat(eqs, terms = NULL, order_terms = FALSE)
 
-eqs2cmat(eqs)
+eqs2cmat(eqs, as_fractions = TRUE)
 
-hmat2cmat(hmat)
+hmat2cmat(hmat, as_fractions = TRUE)
 
-cmat2hmat(cmat)
+cmat2hmat(cmat, as_fractions = TRUE)
 
 hmat2eqs(hmat, as_fractions = TRUE)
 
-cmat2eqs(cmat)
+cmat2eqs(cmat, as_fractions = TRUE)
 }
 \arguments{
 \item{eqs}{A list() of equations}
 
 \item{terms}{(optional) A character vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)}
+
+\item{order_terms}{(optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)}
+
+\item{as_fractions}{Whether to output matrix using fractions formatting (MASS package)}
 
 \item{hmat}{A hypothesis matrix}
 
