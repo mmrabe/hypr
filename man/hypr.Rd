@@ -8,6 +8,10 @@ hypr(..., terms = NULL, order_terms = FALSE)
 }
 \arguments{
 \item{...}{A list of null hypothesis equations}
+
+\item{terms}{(Optional) A list of terms to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a term that is not in this vector.}
+
+\item{order_terms}{(Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically}
 }
 \description{
 Use this function to create hypr objects from null hypothesis equations. Each argument should be one equation. For example, a null hypothesis for the grand mean (GM), often used as the intercept, is usually coded as mu~0.

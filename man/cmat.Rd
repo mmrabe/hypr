@@ -15,6 +15,10 @@ contr.hypothesis(..., add_intercept = FALSE, remove_intercept = FALSE)
 \arguments{
 \item{x}{A hypr object}
 
+\item{add_intercept}{Add intercept column to contrast matrix}
+
+\item{remove_intercept}{Remove intercept column from contrast matrix}
+
 \item{value}{contrast matrix}
 }
 \description{

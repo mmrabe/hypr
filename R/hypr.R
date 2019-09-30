@@ -162,6 +162,8 @@ cmat2eqs <- function(cmat, as_fractions = TRUE) hmat2eqs(cmat2hmat(cmat), as_fra
 #' You may call the function without any arguments. In that case, an empty hypr object is returned. This is useful if you want to derive equations from a known hypothesis matrix or contrast matrix.
 #'
 #' @param ... A list of null hypothesis equations
+#' @param terms (Optional) A list of terms to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a term that is not in this vector.
+#' @param order_terms (Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically
 #'
 #' @examples
 #'
@@ -241,6 +243,8 @@ setMethod("terms", signature(x="hypr"), function(x) rownames(hmat(x)))
 #'
 #' @param x A hypr object
 #' @param value contrast matrix
+#' @param add_intercept Add intercept column to contrast matrix
+#' @param remove_intercept Remove intercept column from contrast matrix
 #' @rdname cmat
 #'
 #' @export
