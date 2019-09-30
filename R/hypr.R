@@ -242,7 +242,11 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
   if(add_intercept && remove_intercept) {
     stop("Cannot add and remove intercept at the same time!")
   } else if(add_intercept) {
-    MASS::as.fractions(cbind(1, x@cmat))
+    if(is.null(colnames(x@cmat))) {
+      MASS::as.fractions(cbind(1, x@cmat))
+    } else {
+      MASS::as.fractions(cbind(Intercept=1, x@cmat))
+    }
   } else if(remove_intercept) {
     MASS::as.fractions(x@cmat[,-1,drop=F])
   } else {
@@ -260,7 +264,11 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
     stop("Cannot add and remove intercept at the same time!")
   } else if(add_intercept) {
     if(!is.matrix(value)) stop("add_intercept=TRUE can only be used with a matrix argument!")
-    value <- cbind(1, value)
+    if(is.null(colnames(value))) {
+      value <- cbind(1, value)
+    } else {
+      value <- cbind(`Intercept` = 1, value)
+    }
   } else if(remove_intercept) {
     if(!is.matrix(value)) stop("remove_intercept=TRUE can only be used with a matrix argument!")
     value <- value[,-1,drop=F]
