@@ -36,7 +36,7 @@ setMethod(show, "hypr", function(object) {
   }
 })
 
-parse_hypothesis <- function(expr, valid_terms = NULL) {
+parse_hypothesis <- function(expr, valid_terms = NULL, order_terms = FALSE) {
   if(!is(expr, "formula")) {
     stop("`expr` must be a formula")
   }
@@ -67,6 +67,7 @@ check_names <- function(nvec) {
 #' @name conversions
 #' @param eqs A list() of equations
 #' @param terms (optional) A character vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)
+#' @param order_terms (optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)
 #' @param cmat A contrast matrix
 #' @param hmat A hypothesis matrix
 #' @return A list of equations (hmat2eqs and cmat2eqs), a contrast matrix (hmat2cmat, eqs2cmat), or a hypothesis matrix (cmat2hmat, eqs2hmat)
@@ -76,9 +77,12 @@ NULL
 #' @describeIn conversions Convert null hypothesis equations to hypothesis matrix
 #'
 #' @export
-eqs2hmat <- function(eqs, terms = NULL) {
+eqs2hmat <- function(eqs, terms = NULL, order_terms = FALSE) {
   if(is.null(terms)) {
     terms <- unique(unlist(lapply(eqs, function(h) unlist(lapply(h, function(x) x@var)))))
+  }
+  if(order_terms) {
+    terms <- sort(terms)
   }
   if(!is.list(eqs) || !all(vapply(eqs, function(x) is(x, "expr_sum"), logical(1)))) {
     stop("`eqs` must be a list of expr_sums!")
@@ -181,7 +185,7 @@ cmat2eqs <- function(cmat) hmat2eqs(cmat2hmat(cmat))
 #' h
 #'
 #' @export
-hypr <- function(..., terms = NULL) {
+hypr <- function(..., terms = NULL, order_terms = FALSE) {
   hyps = list(...)
   if(length(hyps) == 0) {
     return(new("hypr"))
@@ -191,8 +195,8 @@ hypr <- function(..., terms = NULL) {
   if(!all(vapply(hyps, function(x) is(x, "formula"), logical(1)))) {
     stop("Arguments to hypr() must be formulas or a list() of those.")
   }
-  parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = terms)
-  hmat <- eqs2hmat(parsed_hypotheses)
+  parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = terms, order_terms = order_terms)
+  hmat <- eqs2hmat(parsed_hypotheses, terms = terms, order_terms = order_terms)
   cmat <- hmat2cmat(hmat)
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
 }
