@@ -25,5 +25,4 @@ LazyData: true
 RoxygenNote: 6.1.1
 Collate: 
     'equations.R'
-    'hello.R'
     'hypr.R'
