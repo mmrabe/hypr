@@ -1,6 +1,6 @@
 
 setClass("expr_num")
-expr_num <- function(object) if(is(object, "expr_frac")) show.expr_frac(object) else if(is(object, "expr_real")) show.expr_real(object) else show(object)
+show.expr_num <- function(object) if(is(object, "expr_frac")) show.expr_frac(object) else if(is(object, "expr_real")) show.expr_real(object) else show(object)
 
 setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 0L, den = 1L), contains = "expr_num")
 show.expr_frac <- function(object) if(object@den!=1L) cat(sprintf("%d/%d", object@num, object@den)) else cat(object@num)
@@ -16,7 +16,7 @@ show.expr_coef <- function(object) {
     if(as.numeric.expr_num(object@num) == -1) {
       cat("-")
     } else {
-      show(object@num)
+      show.expr_num(object@num)
       if(length(object@var) > 0) {
         cat("*")
       }
