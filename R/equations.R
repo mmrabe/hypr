@@ -25,6 +25,32 @@ show.expr_coef <- function(object) {
   cat(paste(object@var, collapse = "*"))
 }
 #setMethod("show", "expr_coef", show.expr_coef)
+as.expression.expr_coef <- function(x, ...) {
+  if(is(x@num, "expr_real")) {
+    ret <- x@num@num
+  } else if(is(x@num, "expr_frac")) {
+    if(x@num@den != 1) {
+      ret <- call("/", as.double(x@num@num), as.double(x@num@den))
+    } else {
+      ret <- as.double(x@num@num)
+    }
+  }
+  if(length(x@var) > 0) {
+    var_calls <- as.symbol(x@var[1])
+    for(var in x@var[-1]) {
+      var_calls <- call("*", var_calls, as.symbol(var))
+    }
+    if(as.numeric.expr_num(x@num) == 1) {
+      ret <- var_calls
+    } else if(as.numeric.expr_num(x@num) == -1) {
+      ret <- call("-", var_calls)
+    } else {
+      ret <- call("*", ret, var_calls)
+    }
+  }
+  ret
+}
+#setMethod("as.expression", "expr_coef", as.expression.expr_coef)
 
 setClass("expr_sum", contains = "list")
 show.expr_sum <- function(object) {
@@ -47,6 +73,23 @@ show.expr_sum <- function(object) {
   }
 }
 #setMethod("show", "expr_sum", show.expr_sum)
+
+as.formula.expr_sum <- function(object, env = parent.frame()) {
+  if(length(object) == 0) {
+    return(0~0)
+  }
+  ret <- as.expression.expr_coef(object[[1]])
+  for(el in object[-1]) {
+    if(as.numeric.expr_num(el@num) == 0) {
+      next
+    } else if(as.numeric.expr_num(el@num) < 0) {
+      ret <- call("-", ret, as.expression.expr_coef(multiply_expr(el, new("expr_coef", num = new("expr_frac", num = -1L)))))
+    } else {
+      ret <- call("+", ret, as.expression.expr_coef(el))
+    }
+  }
+  call("~", ret, 0)
+}
 
 
 as.numeric.expr_num <- function(x) {
