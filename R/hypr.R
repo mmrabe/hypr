@@ -16,7 +16,7 @@ setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 #' @describeIn hypr Show summary of hypr object
 #'
 #' @export
-setMethod(show, "hypr", function(object) {
+setMethod("show", "hypr", function(object) {
   if(length(object@eqs) == 0) {
     cat("This hypr object does not contain hypotheses.")
   } else {
@@ -29,7 +29,7 @@ setMethod(show, "hypr", function(object) {
     eq.names <- sprintf("H0.%s", if(is.null(names(object@eqs))) seq_along(object@eqs) else names(object@eqs))
     for(i in seq_along(object@eqs)) {
       cat(sprintf("%*s: 0 = ", max(nchar(eq.names)), eq.names[i]))
-      show(object@eqs[[i]])
+      show.expr_sum(object@eqs[[i]])
       cat("\n")
     }
     cat("\nHypothesis matrix (transposed):\n")
@@ -242,7 +242,10 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
 
 #' @describeIn hmat Set transposed hypothesis matrix
 #' @export
-`thmat<-` <- function(x, value) hmat(x) <- t(value)
+`thmat<-` <- function(x, value) {
+  hmat(x) <- t(value)
+  x
+}
 
 #' Retrieve the terms (variables) used in a hypr object
 #'
@@ -308,22 +311,22 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
   if(is.null(rownames(value))) {
     rownames(value) <- sprintf("mu%d", seq_len(nrow(value)))
   } else {
-    rownames(value) <- vapply(rownames(value), function(s) if(grepl("^[^A-Za-z_]", s)) paste0("mu",s) else s, character(1))
+    rownames(value) <- vapply(rownames(value), function(s) if(grepl("^[^A-Za-z_]", s)) paste0("mu",s) else s, character(1), USE.NAMES = FALSE)
   }
   class(value) <- setdiff(class(value), "fractions")
   x@cmat <- value
   x@hmat <- cmat2hmat(value, as_fractions = FALSE)
-  x@eqs <- hmat2eqs(x@hmat)
+  x@eqs <- hmat2expr(x@hmat)
   x
 }
 
 
 #' @describeIn cmat Retrieve contrast matrix to override factor contrasts
 #' @export
-contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = FALSE) {
+contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = TRUE) {
   args <- list(...)
   if(length(args) == 1 && is.numeric(args[[1]])) {
-    stats::contr.treatment(args[[1]])
+    stop("`contr.hypothesis` cannot be used with a numeric argument. Please specify explicit hypotheses!")
   } else if(length(args) == 1 && is(args[[1]], "hypr")) {
     cmat(x = args[[1]], add_intercept = add_intercept, remove_intercept = remove_intercept)
   } else {
@@ -342,7 +345,8 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = FALS
 #'
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {
-  y <- MASS::ginv(x)
+  if(!is.matrix(x) || !is.numeric(x)) stop("`x` must be a numeric matrix!")
+  y <- round(MASS::ginv(x), -log10(.Machine$double.neg.eps*10))
   dimnames(y) <- dimnames(x)[2:1]
   if(as_fractions) MASS::fractions(y) else y
 }
