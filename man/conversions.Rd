@@ -10,7 +10,7 @@
 \alias{cmat2eqs}
 \title{Shorthand versions for simple hypothesis translation}
 \usage{
-eqs2hmat(eqs, terms = NULL, order_terms = FALSE)
+eqs2hmat(eqs, terms = NULL, order_terms = FALSE, as_fractions = TRUE)
 
 eqs2cmat(eqs, as_fractions = TRUE)
 
@@ -23,23 +23,23 @@ hmat2eqs(hmat, as_fractions = TRUE)
 cmat2eqs(cmat, as_fractions = TRUE)
 }
 \arguments{
-\item{eqs}{A list() of equations}
+\item{eqs}{A \code{list} of equations}
 
-\item{terms}{(optional) A character vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)}
+\item{terms}{(optional) A \code{character} vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)}
 
 \item{order_terms}{(optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)}
 
-\item{as_fractions}{Whether to output matrix using fractions formatting (MASS package)}
+\item{as_fractions}{(optional) Whether to output matrix using fractions formatting (via \code{\link[MASS:as.fractions]{MASS::as.fractions}}). Defaults to \code{TRUE}.}
 
-\item{hmat}{A hypothesis matrix}
+\item{hmat}{Hypothesis matrix}
 
-\item{cmat}{A contrast matrix}
+\item{cmat}{Contrast matrix}
 }
 \value{
-A list of equations (hmat2eqs and cmat2eqs), a contrast matrix (hmat2cmat, eqs2cmat), or a hypothesis matrix (cmat2hmat, eqs2hmat)
+A \code{list} of equations (\code{hmat2eqs} and \code{cmat2eqs}), a contrast matrix (\code{hmat2cmat}, \code{eqs2cmat}), or a hypothesis matrix (\code{cmat2hmat}, \code{eqs2hmat}).
 }
 \description{
-Shorthand versions for simple hypothesis translation
+These functions can be used to translate between null hypothesis equations, hypothesis matrices, and contrast matrices without defining a \code{hypr} object. Note that some of these functions do generate a \code{hypr} object internally but they never return one.
 }
 \section{Functions}{
 \itemize{
@@ -56,3 +56,38 @@ Shorthand versions for simple hypothesis translation
 \item \code{cmat2eqs}: Convert contrast matrix to null hypothesis equations
 }}
 
+\examples{
+
+# The following examples are based on a 2-level treatment contrast (i.e., baseline and treatment).
+hypotheses <- list(baseline = mu1~0, treatment = mu2~mu1)
+hypothesis_matrix <- matrix(
+    c(c(1, -1), c(0, 1)), ncol = 2, dimnames = list(c("baseline","treatment"), c("mu1", "mu2")))
+contrast_matrix <- matrix(
+    c(c(1, 1), c(0, 1)), ncol = 2, dimnames = list(c("mu1","mu2"), c("baseline", "treatment")))
+
+# Convert a list of null hypothesis equations to ...
+# ... a hypothesis matrix:
+eqs2hmat(hypotheses)
+# ... a contrast matrix:
+eqs2cmat(hypotheses)
+
+# Convert a hypothesis matrix to...
+# ... a list of null hypothesis equations:
+hmat2eqs(hypothesis_matrix)
+# ... a contrast matrix:
+hmat2cmat(hypothesis_matrix)
+
+# Convert a contrast matrix to...
+# ... a list of null hypothesis equations:
+cmat2eqs(contrast_matrix)
+# ... a hypothesis matrix:
+cmat2hmat(contrast_matrix)
+
+
+# Are all functions returning the expected results?
+stopifnot(all.equal(eqs2hmat(hypotheses, as_fractions = FALSE), hypothesis_matrix))
+stopifnot(all.equal(eqs2cmat(hypotheses, as_fractions = FALSE), contrast_matrix))
+stopifnot(all.equal(hmat2cmat(hypothesis_matrix, as_fractions = FALSE), contrast_matrix))
+stopifnot(all.equal(cmat2hmat(contrast_matrix, as_fractions = FALSE), hypothesis_matrix))
+
+}

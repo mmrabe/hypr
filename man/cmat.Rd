@@ -10,21 +10,24 @@ cmat(x, add_intercept = FALSE, remove_intercept = FALSE)
 
 cmat(x, add_intercept = FALSE, remove_intercept = FALSE) <- value
 
-contr.hypothesis(..., add_intercept = FALSE, remove_intercept = FALSE)
+contr.hypothesis(..., add_intercept = FALSE, remove_intercept = TRUE)
 }
 \arguments{
 \item{x}{A hypr object}
 
-\item{add_intercept}{Add intercept column to contrast matrix}
+\item{add_intercept}{Add additional intercept column to contrast matrix}
 
-\item{remove_intercept}{Remove intercept column from contrast matrix}
+\item{remove_intercept}{Remove intercept column from contrast matrix (assumed to be the first column)}
 
 \item{value}{contrast matrix}
 
 \item{...}{A list of hypothesis equations for which to retrieve a contrast matrix}
 }
+\value{
+A \code{matrix} of contrast codes with contrasts as columns and terms as rows.
+}
 \description{
-Use these functions to retrieve or set a hypr object's contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
+Use these functions to retrieve or set a \code{hypr} object’s contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
 }
 \section{Functions}{
 \itemize{
@@ -33,3 +36,16 @@ Use these functions to retrieve or set a hypr object's contrast matrix. If used 
 \item \code{contr.hypothesis}: Retrieve contrast matrix to override factor contrasts
 }}
 
+\examples{
+
+h <- hypr(mu1~0, mu2~mu1)
+cmat(h) # retrieve the contrast matrix
+
+contr.hypothesis(h) # by default without intercept (removes first column)
+contr.hypothesis(mu1~0, mu2~mu1)
+
+h2 <- hypr()
+cmat(h2) <- cmat(h) # copy contrast matrix to other hypr object
+
+
+}

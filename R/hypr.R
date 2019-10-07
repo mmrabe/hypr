@@ -3,17 +3,55 @@
 NULL
 
 
-#' An object containing null hypotheses, a hypothesis matrix, and a contrast matrix
+#' S4 class “hypr” and its methods
 #'
-#' @param object a hypr object
+#' A \code{hypr} object contains equations, a hypothesis matrix and a contrast matrix, all of which are related to each other. See below for methods.
 #'
-#' @slot eqs A list of null hypotheses
-#' @slot hmat A hypothesis matrix
-#' @slot cmat A contrast matrix
+#' To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
+#'
+#' @param object,x a hypr object
+#' @param value A list of null hypothesis equations
+#' @param ... (ignored)
+#'
+#' @slot eqs List of null hypotheses
+#' @slot hmat Hypothesis matrix
+#' @slot cmat Contrast matrix
+#'
+#' @examples
+#' # Equations and matrices in a hypr object are always congruent
+#' # Therefore creating a hypr object h and then copying ...
+#' h <- hypr(mu1~0, mu2~mu1)
+#'
+#' # ... its equations, ...
+#' h2 <- hypr()
+#' formula(h2) <- formula(h)
+#'
+#' # ... its hypothesis matrix, ...
+#' h3 <- hypr()
+#' hmat(h3) <- hmat(h)
+#'
+#' # ... or its contast matrix ...
+#' h4 <- hypr()
+#' cmat(h4) <- cmat(h)
+#'
+#' # ... over to another hypr object is the same as copying the object:
+#' h5 <- h
+#'
+#' stopifnot(all.equal(hmat(h), hmat(h2)))
+#' stopifnot(all.equal(cmat(h), cmat(h2)))
+#' stopifnot(all.equal(hmat(h), hmat(h3)))
+#' stopifnot(all.equal(cmat(h), cmat(h3)))
+#' stopifnot(all.equal(hmat(h), hmat(h4)))
+#' stopifnot(all.equal(cmat(h), cmat(h4)))
+#' stopifnot(all.equal(hmat(h), hmat(h5)))
+#' stopifnot(all.equal(cmat(h), cmat(h5)))
+#'
+#'
+#' @seealso \code{\link[hypr]{hypr}}, \code{\link[hypr]{cmat}}, \code{\link[hypr]{hmat}}
 #'
 setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 
-#' @describeIn hypr Show summary of hypr object
+#' @describeIn hypr Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
 #'
 #' @export
 setMethod("show", "hypr", function(object) {
@@ -67,14 +105,51 @@ check_names <- function(nvec) {
 
 #' Shorthand versions for simple hypothesis translation
 #'
+#' These functions can be used to translate between null hypothesis equations, hypothesis matrices, and contrast matrices without defining a \code{hypr} object. Note that some of these functions do generate a \code{hypr} object internally but they never return one.
+#'
 #' @name conversions
-#' @param eqs A list() of equations
-#' @param terms (optional) A character vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)
+#' @param eqs A \code{list} of equations
+#' @param terms (optional) A \code{character} vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)
 #' @param order_terms (optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)
-#' @param cmat A contrast matrix
-#' @param hmat A hypothesis matrix
-#' @param as_fractions Whether to output matrix using fractions formatting (MASS package)
-#' @return A list of equations (hmat2eqs and cmat2eqs), a contrast matrix (hmat2cmat, eqs2cmat), or a hypothesis matrix (cmat2hmat, eqs2hmat)
+#' @param cmat Contrast matrix
+#' @param hmat Hypothesis matrix
+#' @param as_fractions (optional) Whether to output matrix using fractions formatting (via \code{\link[MASS:as.fractions]{MASS::as.fractions}}). Defaults to \code{TRUE}.
+#'
+#' @return A \code{list} of equations (\code{hmat2eqs} and \code{cmat2eqs}), a contrast matrix (\code{hmat2cmat}, \code{eqs2cmat}), or a hypothesis matrix (\code{cmat2hmat}, \code{eqs2hmat}).
+#'
+#' @examples
+#'
+#' # The following examples are based on a 2-level treatment contrast (i.e., baseline and treatment).
+#' hypotheses <- list(baseline = mu1~0, treatment = mu2~mu1)
+#' hypothesis_matrix <- matrix(
+#'     c(c(1, -1), c(0, 1)), ncol = 2, dimnames = list(c("baseline","treatment"), c("mu1", "mu2")))
+#' contrast_matrix <- matrix(
+#'     c(c(1, 1), c(0, 1)), ncol = 2, dimnames = list(c("mu1","mu2"), c("baseline", "treatment")))
+#'
+#' # Convert a list of null hypothesis equations to ...
+#' # ... a hypothesis matrix:
+#' eqs2hmat(hypotheses)
+#' # ... a contrast matrix:
+#' eqs2cmat(hypotheses)
+#'
+#' # Convert a hypothesis matrix to...
+#' # ... a list of null hypothesis equations:
+#' hmat2eqs(hypothesis_matrix)
+#' # ... a contrast matrix:
+#' hmat2cmat(hypothesis_matrix)
+#'
+#' # Convert a contrast matrix to...
+#' # ... a list of null hypothesis equations:
+#' cmat2eqs(contrast_matrix)
+#' # ... a hypothesis matrix:
+#' cmat2hmat(contrast_matrix)
+#'
+#'
+#' # Are all functions returning the expected results?
+#' stopifnot(all.equal(eqs2hmat(hypotheses, as_fractions = FALSE), hypothesis_matrix))
+#' stopifnot(all.equal(eqs2cmat(hypotheses, as_fractions = FALSE), contrast_matrix))
+#' stopifnot(all.equal(hmat2cmat(hypothesis_matrix, as_fractions = FALSE), contrast_matrix))
+#' stopifnot(all.equal(cmat2hmat(contrast_matrix, as_fractions = FALSE), hypothesis_matrix))
 #'
 NULL
 
@@ -180,6 +255,10 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #' @param terms (Optional) A list of terms to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a term that is not in this vector.
 #' @param order_terms (Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically
 #'
+#' @return A \code{hypr} object
+#'
+#' @seealso S4 class \code{\link[hypr:hypr-class]{hypr}}
+#'
 #' @examples
 #'
 #' # Create an empty hypr object (no hypotheses):
@@ -219,8 +298,32 @@ hypr <- function(..., terms = NULL, order_terms = FALSE) {
 #'
 #' @rdname hmat
 #' @param x A hypr object
-#' @param as_fractions Whether to format matrix as fractions (MASS package)
+#' @param as_fractions Whether to format matrix as fractions (via \code{\link[MASS:as.fractions]{MASS::as.fractions}})
 #' @param value Hypothesis matrix
+#'
+#' @return Hypothesis matrix of \code{x}
+#'
+#' @examples
+#'
+#' h <- hypr(mu1~0, mu2~mu1)
+#'
+#' # To retrieve the hypothesis matrix of `h`:
+#' hmat(h)
+#'
+#' # To retrieve the transposed hypothesis matrix of `h`:
+#' thmat(h)
+#'
+#' # Setting the hypothesis matrix of `h`:
+#' hmat(h) <- matrix(c(1,-1,0,1), ncol=2, dimnames=list(NULL, c("mu1","mu2")))
+#' h
+#'
+#' h2 <- hypr() # an empty hypr object
+#' thmat(h2) <- matrix(c(1,0,-1,1), ncol=2, dimnames=list(c("mu1","mu2"), NULL))
+#' h2
+#'
+#' # `h` and `h2` should be identical:
+#' stopifnot(all.equal(hmat(h), hmat(h2)))
+#' stopifnot(all.equal(cmat(h), cmat(h2)))
 #'
 #' @export
 hmat <- function(x, as_fractions = TRUE) if(as_fractions) MASS::as.fractions(x@hmat) else x@hmat
@@ -247,30 +350,73 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
   x
 }
 
-#' Retrieve the terms (variables) used in a hypr object
+#' @describeIn hypr Retrieve the terms (variable names) used in a \code{hypr} object
 #'
-#' @param x A hypr object
 #' @return A character vector of term names
 #'
 #' @export
 setMethod("terms", signature(x="hypr"), function(x) rownames(hmat(x)))
 
+#' Manipulate the formulas of an S4 object
+#'
+#' This is a generic function for setting an S4 object’s formulas.
+#'
+#' @param x The object to manipulate
+#' @param ... Additional arguments passed on to the method
+#' @param value The new formula
+#'
+#'
+#' @export
 setGeneric("formula<-", function(x, ..., value) UseMethod("formula<-", x))
 
+#' @describeIn hypr Retrieve a \code{hypr} object’s null hypothesis equations.
+#'
+#' @return A \code{list} of null hypothesis equations
+#'
+#' @examples
+#' h <- hypr(mu1~0, mu2~mu1)
+#' formula(h)
+#'
+#' h2 <- hypr()
+#' formula(h2) <- formula(h)
+#' h2
+#' formula(h2)
+#'
+#' # After updating, matrices should be equal
+#' stopifnot(all.equal(hmat(h), hmat(h2)))
+#' stopifnot(all.equal(cmat(h), cmat(h2)))
+#'
+#' @export
 setMethod("formula", signature(x="hypr"), function(x, ...) sapply(x@eqs, as.formula.expr_sum, simplify = FALSE))
 
+#' @describeIn hypr Modify a \code{hypr} object’s null hypothesis equations
+#' @export
 setMethod("formula<-", signature(x="hypr"), function(x, ..., value) hypr(value))
 
 #' Retrieve or set contrast matrix
 #'
-#' Use these functions to retrieve or set a hypr object's contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
+#' Use these functions to retrieve or set a \code{hypr} object’s contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
 #'
 #' @param x A hypr object
 #' @param value contrast matrix
-#' @param add_intercept Add intercept column to contrast matrix
-#' @param remove_intercept Remove intercept column from contrast matrix
+#' @param add_intercept Add additional intercept column to contrast matrix
+#' @param remove_intercept Remove intercept column from contrast matrix (assumed to be the first column)
 #' @param ... A list of hypothesis equations for which to retrieve a contrast matrix
 #' @rdname cmat
+#'
+#' @return A \code{matrix} of contrast codes with contrasts as columns and terms as rows.
+#'
+#' @examples
+#'
+#' h <- hypr(mu1~0, mu2~mu1)
+#' cmat(h) # retrieve the contrast matrix
+#'
+#' contr.hypothesis(h) # by default without intercept (removes first column)
+#' contr.hypothesis(mu1~0, mu2~mu1)
+#'
+#' h2 <- hypr()
+#' cmat(h2) <- cmat(h) # copy contrast matrix to other hypr object
+#'
 #'
 #' @export
 cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
@@ -334,14 +480,27 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = TRUE
   }
 }
 
-#' Nice generalized inverse
+#' Enhanced generalized inverse function
 #'
-#' This function calculates the generalized inverse of x, formats it as fractions and copies dimension names from the original matrix.
+#' This function is a wrapper for \code{MASS::ginv} and calculates the generalized inverse of \code{x}.
+#'
+#' In addition to \code{MASS::ginv}, this function rounds values, formats the matrix as fractions and copies dimension names from the original matrix.
 #'
 #' @param x The original matrix
 #' @param as_fractions Whether to format the matrix as fractions (MASS package)
-#' @return Nice generalized inverse
-#' @seealso MASS::ginv()
+#' @return Generalized inverse of \code{x}
+#' @seealso \code{\link[MASS]{ginv}}
+#'
+#' @examples
+#'
+#' h <- hypr(mu1~0, mu2~mu1)
+#' hmat(h)
+#'
+#' ginv2(hmat(h))
+#' cmat(h)
+#'
+#' # cmat is effectively the generalized inverse of hmat
+#' stopifnot(all.equal(ginv2(hmat(h)), cmat(h)))
 #'
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {

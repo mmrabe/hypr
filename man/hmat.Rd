@@ -18,9 +18,12 @@ thmat(x) <- value
 \arguments{
 \item{x}{A hypr object}
 
-\item{as_fractions}{Whether to format matrix as fractions (MASS package)}
+\item{as_fractions}{Whether to format matrix as fractions (via \code{\link[MASS:as.fractions]{MASS::as.fractions}})}
 
 \item{value}{Hypothesis matrix}
+}
+\value{
+Hypothesis matrix of \code{x}
 }
 \description{
 Use these functions to retrieve or set a hypr object's hypothesis matrix. If used for updating, the contrast matrix and equations are derived automatically.
@@ -34,3 +37,26 @@ Use these functions to retrieve or set a hypr object's hypothesis matrix. If use
 \item \code{thmat<-}: Set transposed hypothesis matrix
 }}
 
+\examples{
+
+h <- hypr(mu1~0, mu2~mu1)
+
+# To retrieve the hypothesis matrix of `h`:
+hmat(h)
+
+# To retrieve the transposed hypothesis matrix of `h`:
+thmat(h)
+
+# Setting the hypothesis matrix of `h`:
+hmat(h) <- matrix(c(1,-1,0,1), ncol=2, dimnames=list(NULL, c("mu1","mu2")))
+h
+
+h2 <- hypr() # an empty hypr object
+thmat(h2) <- matrix(c(1,0,-1,1), ncol=2, dimnames=list(c("mu1","mu2"), NULL))
+h2
+
+# `h` and `h2` should be identical:
+stopifnot(all.equal(hmat(h), hmat(h2)))
+stopifnot(all.equal(cmat(h), cmat(h2)))
+
+}

@@ -4,28 +4,101 @@
 \name{hypr-class}
 \alias{hypr-class}
 \alias{show,hypr-method}
-\title{An object containing null hypotheses, a hypothesis matrix, and a contrast matrix}
+\alias{terms,hypr-method}
+\alias{formula,hypr-method}
+\alias{formula<-,hypr-method}
+\title{S4 class “hypr” and its methods}
 \usage{
 \S4method{show}{hypr}(object)
+
+\S4method{terms}{hypr}(x)
+
+\S4method{formula}{hypr}(x, ...)
+
+\S4method{formula}{hypr}(x, ...) <- value
 }
 \arguments{
-\item{object}{a hypr object}
+\item{object, x}{a hypr object}
+
+\item{...}{(ignored)}
+
+\item{value}{A list of null hypothesis equations}
+}
+\value{
+A character vector of term names
+
+A \code{list} of null hypothesis equations
 }
 \description{
-An object containing null hypotheses, a hypothesis matrix, and a contrast matrix
+A \code{hypr} object contains equations, a hypothesis matrix and a contrast matrix, all of which are related to each other. See below for methods.
+}
+\details{
+To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Show summary of hypr object
+\item \code{show}: Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
+
+\item \code{terms}: Retrieve the terms (variable names) used in a \code{hypr} object
+
+\item \code{formula}: Retrieve a \code{hypr} object’s null hypothesis equations.
+
+\item \code{formula<-}: Modify a \code{hypr} object’s null hypothesis equations
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{eqs}}{A list of null hypotheses}
+\item{\code{eqs}}{List of null hypotheses}
 
-\item{\code{hmat}}{A hypothesis matrix}
+\item{\code{hmat}}{Hypothesis matrix}
 
-\item{\code{cmat}}{A contrast matrix}
+\item{\code{cmat}}{Contrast matrix}
 }}
 
+\examples{
+# Equations and matrices in a hypr object are always congruent
+# Therefore creating a hypr object h and then copying ...
+h <- hypr(mu1~0, mu2~mu1)
+
+# ... its equations, ...
+h2 <- hypr()
+formula(h2) <- formula(h)
+
+# ... its hypothesis matrix, ...
+h3 <- hypr()
+hmat(h3) <- hmat(h)
+
+# ... or its contast matrix ...
+h4 <- hypr()
+cmat(h4) <- cmat(h)
+
+# ... over to another hypr object is the same as copying the object:
+h5 <- h
+
+stopifnot(all.equal(hmat(h), hmat(h2)))
+stopifnot(all.equal(cmat(h), cmat(h2)))
+stopifnot(all.equal(hmat(h), hmat(h3)))
+stopifnot(all.equal(cmat(h), cmat(h3)))
+stopifnot(all.equal(hmat(h), hmat(h4)))
+stopifnot(all.equal(cmat(h), cmat(h4)))
+stopifnot(all.equal(hmat(h), hmat(h5)))
+stopifnot(all.equal(cmat(h), cmat(h5)))
+
+
+h <- hypr(mu1~0, mu2~mu1)
+formula(h)
+
+h2 <- hypr()
+formula(h2) <- formula(h)
+h2
+formula(h2)
+
+# After updating, matrices should be equal
+stopifnot(all.equal(hmat(h), hmat(h2)))
+stopifnot(all.equal(cmat(h), cmat(h2)))
+
+}
+\seealso{
+\code{\link[hypr]{hypr}}, \code{\link[hypr]{cmat}}, \code{\link[hypr]{hmat}}
+}

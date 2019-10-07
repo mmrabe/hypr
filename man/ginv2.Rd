@@ -2,7 +2,7 @@
 % Please edit documentation in R/hypr.R
 \name{ginv2}
 \alias{ginv2}
-\title{Nice generalized inverse}
+\title{Enhanced generalized inverse function}
 \usage{
 ginv2(x, as_fractions = TRUE)
 }
@@ -12,11 +12,26 @@ ginv2(x, as_fractions = TRUE)
 \item{as_fractions}{Whether to format the matrix as fractions (MASS package)}
 }
 \value{
-Nice generalized inverse
+Generalized inverse of \code{x}
 }
 \description{
-This function calculates the generalized inverse of x, formats it as fractions and copies dimension names from the original matrix.
+This function is a wrapper for \code{MASS::ginv} and calculates the generalized inverse of \code{x}.
+}
+\details{
+In addition to \code{MASS::ginv}, this function rounds values, formats the matrix as fractions and copies dimension names from the original matrix.
+}
+\examples{
+
+h <- hypr(mu1~0, mu2~mu1)
+hmat(h)
+
+ginv2(hmat(h))
+cmat(h)
+
+# cmat is effectively the generalized inverse of hmat
+stopifnot(all.equal(ginv2(hmat(h)), cmat(h)))
+
 }
 \seealso{
-MASS::ginv()
+\code{\link[MASS]{ginv}}
 }

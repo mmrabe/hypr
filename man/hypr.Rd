@@ -13,6 +13,9 @@ hypr(..., terms = NULL, order_terms = FALSE)
 
 \item{order_terms}{(Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically}
 }
+\value{
+A \code{hypr} object
+}
 \description{
 Use this function to create hypr objects from null hypothesis equations. Each argument should be one equation. For example, a null hypothesis for the grand mean (GM), often used as the intercept, is usually coded as mu~0.
 }
@@ -35,4 +38,7 @@ h <- hypr()
 cmat(h, add_intercept = TRUE) <- contr.treatment(c("mu1","mu2","mu3"))
 h
 
+}
+\seealso{
+S4 class \code{\link[hypr:hypr-class]{hypr}}
 }
