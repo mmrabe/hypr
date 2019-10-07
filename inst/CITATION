@@ -11,3 +11,16 @@ bibentry(
     person(given = "Reinhold", family = "Kliegl")
   )
 )
+
+bibentry(
+  bibtype = "Unpublished",
+  title = "Contrast coding in R using the hypr package",
+  year = 2019,
+  note = "Manuscript in preparation",
+  author = c(
+    person(given = "Maximilian M.", family = "Rabe"),
+    person(given = "Daniel J.", family = "Schad"),
+    person(given = "Shravan", family = "Vasishth"),
+    person(given = "Reinhold", family = "Kliegl")
+  )
+)
