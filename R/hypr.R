@@ -40,7 +40,7 @@ setMethod(show, "hypr", function(object) {
 })
 
 parse_hypothesis <- function(expr, valid_terms = NULL, order_terms = FALSE) {
-  if(!is(expr, "formula")) {
+  if(!is.formula(expr)) {
     stop("`expr` must be a formula")
   }
   ret <- simplify_expr_sum(simplify_expr(call("-",expr[[2]],expr[[3]])))
@@ -81,22 +81,27 @@ NULL
 #' @describeIn conversions Convert null hypothesis equations to hypothesis matrix
 #'
 #' @export
-eqs2hmat <- function(eqs, terms = NULL, order_terms = FALSE) {
+eqs2hmat <- function(eqs, terms = NULL, order_terms = FALSE, as_fractions = TRUE) {
+  if(!is.list(eqs) || !all(vapply(eqs, function(x) is(x, "formula"), logical(1)))) {
+    stop("`eqs` must be a list of formulas!")
+  }
+  expr <- lapply(eqs, parse_hypothesis, valid_terms = terms, order_terms = order_terms)
+  expr2hmat(expr, terms = terms, order_terms = order_terms, as_fractions = as_fractions)
+}
+
+expr2hmat <- function(expr, terms = NULL, order_terms = FALSE, as_fractions = TRUE) {
   if(is.null(terms)) {
-    terms <- unique(unlist(lapply(eqs, function(h) unlist(lapply(h, function(x) x@var)))))
+    terms <- unique(unlist(lapply(expr, function(h) unlist(lapply(h, function(x) x@var)))))
   }
   if(order_terms) {
     terms <- sort(terms)
   }
-  if(!is.list(eqs) || !all(vapply(eqs, function(x) is(x, "expr_sum"), logical(1)))) {
-    stop("`eqs` must be a list of expr_sums!")
-  }
-  if(!check_names(names(eqs))) {
+  if(!check_names(names(expr))) {
     stop("If equations are named, all must be named and names must be valid variable names in R!")
   }
-  ret <- as.matrix(vapply(seq_along(eqs), function(i) {
+  ret <- as.matrix(vapply(seq_along(expr), function(i) {
     vapply(terms, function(j) {
-      for(el in eqs[[i]]) {
+      for(el in expr[[i]]) {
         if(setequal_exact(el@var, j)) {
           return(as.fractions.expr_num(el@num))
         }
@@ -105,8 +110,11 @@ eqs2hmat <- function(eqs, terms = NULL, order_terms = FALSE) {
     }, double(1))
   }, double(length(terms))))
   rownames(ret) <- terms
-  colnames(ret) <- names(eqs)
-  t(ret)
+  colnames(ret) <- names(expr)
+  if(as_fractions)
+    MASS::as.fractions(t(ret))
+  else
+    t(ret)
 }
 
 #' @describeIn conversions Convert null hypothesis equations to contrast matrix
@@ -133,7 +141,9 @@ cmat2hmat <- function(cmat, as_fractions = TRUE) {
 
 #' @describeIn conversions Convert hypothesis matrix to null hypothesis equations
 #' @export
-hmat2eqs <- function(hmat, as_fractions = TRUE) {
+hmat2eqs <- function(hmat, as_fractions = TRUE) sapply(hmat2expr(hmat, as_fractions = as_fractions), as.formula.expr_sum, simplify = FALSE)
+
+hmat2expr <- function(hmat, as_fractions = TRUE) {
   if(!check_names(rownames(hmat))) {
     stop("If hypothesis matrix columns are named, all must be named and names must be valid variable names in R!")
   }
@@ -157,6 +167,8 @@ hmat2eqs <- function(hmat, as_fractions = TRUE) {
 #' @describeIn conversions Convert contrast matrix to null hypothesis equations
 #' @export
 cmat2eqs <- function(cmat, as_fractions = TRUE) hmat2eqs(cmat2hmat(cmat), as_fractions = as_fractions)
+
+is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 
 #' Create a hypr object
 #'
@@ -192,11 +204,11 @@ hypr <- function(..., terms = NULL, order_terms = FALSE) {
   } else if(length(hyps) == 1 && is.list(hyps[[1]])) {
     hyps <- hyps[[1]]
   }
-  if(!all(vapply(hyps, function(x) is(x, "formula"), logical(1)))) {
+  if(!all(vapply(hyps, is.formula, logical(1)))) {
     stop("Arguments to hypr() must be formulas or a list() of those.")
   }
   parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = terms, order_terms = order_terms)
-  hmat <- eqs2hmat(parsed_hypotheses, terms = terms, order_terms = order_terms)
+  hmat <- expr2hmat(parsed_hypotheses, terms = terms, order_terms = order_terms, as_fractions = FALSE)
   cmat <- hmat2cmat(hmat, as_fractions = FALSE)
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
 }
@@ -222,7 +234,7 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
 `hmat<-` <- function(x, value) {
   class(value) <- setdiff(class(value), "fractions")
   x@hmat <- value
-  x@eqs <- hmat2eqs(value)
+  x@eqs <- hmat2expr(value)
   x@cmat <- hmat2cmat(value, as_fractions = FALSE)
   x
 }
@@ -239,6 +251,12 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
 #'
 #' @export
 setMethod("terms", signature(x="hypr"), function(x) rownames(hmat(x)))
+
+setGeneric("formula<-", function(x, ..., value) UseMethod("formula<-", x))
+
+setMethod("formula", signature(x="hypr"), function(x, ...) sapply(x@eqs, as.formula.expr_sum, simplify = FALSE))
+
+setMethod("formula<-", signature(x="hypr"), function(x, ..., value) hypr(value))
 
 #' Retrieve or set contrast matrix
 #'
