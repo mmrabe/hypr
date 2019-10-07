@@ -9,8 +9,8 @@ Authors@R: c(
     person(given = "Shravan", family = "Vasishth", role = c("aut")),
     person(given = "Sven", family = "Hohenstein", role = c("aut")),
     person(given = "Reinhold", family = "Kliegl", email = "kliegl@uni-potsdam.de", role = c("aut")),
-    person(given = "Daniel", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut")))
-Description: Translation between experimental null hypotheses, hypothesis matrices, and contrast matrices (as used in linear regression models).
+    person(given = "Daniel J.", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut")))
+Description: Translation between experimental null hypotheses, hypothesis matrices, and contrast matrices as used in linear regression models. The package is based on the method described in Schad, Vasishth, Hohenstein, and Kliegl (2019) <arXiv:1807.10451>.
 License: GPL-3
 Depends: R (>= 3.5.0)
 Imports:
