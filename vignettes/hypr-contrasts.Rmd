@@ -1,0 +1,70 @@
+---
+title: "Using hypr to understand contrasts"
+author: "Daniel J. Schad & Maximilian M. Rabe"
+date: "Oct 9th, 2019"
+output:
+  html_vignette:
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+editor_options: 
+  chunk_output_type: console
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(hypr)
+```
+
+## Background
+
+`hypr` is a package for easy translation between experimental (null) hypotheses, hypothesis matrices and contrast matrices, as used for coding factor contrasts in linear regression models. The package can be used to derive contrasts from hypotheses and vice versa. This vignette provides an example for understanding contrasts by deriving hypotheses from contrast matrices.
+
+For a general introduction to `hypr`, see the `hypr-intro` vignette:
+```{r, eval = FALSE}
+vignette("hypr-intro", package = "hypr")
+```
+
+For an introduction to using `hypr` for contrast coding in regression models, see the `hypr-contrasts` vignette:
+```{r, eval = FALSE}
+vignette("hypr-regression", package = "hypr")
+```
+
+## Example: Treatment contrasts
+
+Treatment contrasts are relatively easy to understand. The intercept tests the statistical significance of the baseline against zero while the contrasts test the significance of the treatments against the baseline.
+
+Even though this is a simple coding scheme, it might not be immediately clear to everyone examining the contrast matrix:
+
+```{r}
+contr.treatment(4) # a contrast matrix for one baseline and 3 treatments
+```
+
+To understand wat this contrast is testing, we can create an empty `hypr` object and set its contrast matrix to the one above:
+
+```{r}
+h <- hypr()
+cmat(h) <- contr.treatment(4)
+h
+```
+
+When looking at the inferred equations, we can see that this contrast tests the significance of the treatments against zero. This is only appropriate if there is no baseline. However, we may want to consider a non-zero baseline. This is usually included in regression models. To let `hypr` know that we are including an intercept for the baseline, we can set the contrast matrix like this:
+
+```{r}
+cmat(h, add_intercept = TRUE) <- contr.treatment(4)
+h
+```
+
+Finally, the derived hypotheses can be formulated as:
+
+\begin{align}
+H_{0_1}:& \; \mu_1 = 0 \\
+H_{0_2}:& \; \mu_2 = \mu_1 \\
+H_{0_3}:& \; \mu_3 = \mu_1 \\
+H_{0_4}:& \; \mu_4 = \mu_1
+\end{align}
+

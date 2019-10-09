@@ -1,0 +1,110 @@
+---
+title: "Introduction to hypr"
+author: "Maximilian M. Rabe"
+date: "Oct 9th, 2019"
+output:
+  html_vignette:
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+editor_options: 
+  chunk_output_type: console
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(hypr)
+```
+
+## Background
+
+`hypr` is a package for easy translation between experimental (null) hypotheses, hypothesis matrices and contrast matrices, as used for coding factor contrasts in linear regression models. The package can be used to derive contrasts from hypotheses and vice versa.
+
+## Creating a hypr object
+
+The `hypr()` function accepts any set of null hypothesis equations as comma-separated arguments. An empty `hypr` object can be created by calling the function without arguments, i.e. empty parantheses.
+
+```{r}
+trtC <- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
+```
+
+If you want to provide names for contrasts, you can name the function arguments as follows but this is totally optional:
+
+```{r}
+trtC <- hypr(base = mu0~0, trt1 = mu1~mu0, trt2 = mu2~mu0, trt3 = mu3~mu0)
+```
+
+
+When calling this function, a `hypr` object named `trtC` is generated which contains all four hypotheses from above as well as the hypothesis and contrast matrices derived from those. We can display a summary like any other object in R:
+
+```{r}
+trtC
+```
+
+These properties can also be directly accessed with the appropriate methods:
+
+```{r}
+formula(trtC) # a list of equations
+levels(trtC) # a vector of corresponding factor levels (variables in equations)
+names(trtC) # a vector of corresponding contrast names
+hmat(trtC) # the hypothesis matrix
+thmat(trtC) # the transposed hypothesis matrix (as displayed in the summary)
+cmat(trtC) # the contrast matrix
+```
+
+All of these methods can also be used to manipulate `hypr` objects. For example, if you would like to create a `hypr` object from a given contrast matrix, you could create an empty `hypr` object and then update its contrast matrix:
+
+```{r}
+otherC <- hypr()
+cmat(otherC) <- cbind(int = 1, contr.treatment(4)) # add intercept to treatment contrast
+otherC
+```
+
+## Deriving contrasts
+
+You can always use `cmat` to derive the complete contrast matrix from a `hypr` object. Note, however, that depending on the contrast scheme used, it might be necessary to remove the intercept contrast from the matrix before assigning it to a factor for regression analysis.
+
+For example, the `trtC` object from above contains such an intercept:
+
+```{r}
+cmat(trtC)
+```
+
+You can set `remove_intercept=TRUE` to drop the intercept:
+
+```{r}
+cmat(trtC, remove_intercept = TRUE)
+```
+
+Other contrast coding schemes such as Helmert contrasts do not yield an intercept term:
+
+```{r}
+helC <- hypr(m2~m1, m3~(m1+m2)/2, m4~(m1+m2+m3)/3)
+cmat(helC)
+```
+
+Setting `remove_intercept=TRUE` would throw an error because the function cannot find the intercept column.
+
+```{r, eval=FALSE}
+cmat(helC, remove_intercept = TRUE) # throws an error
+```
+
+Therefore, when you are unsure whether to set `remove_intercept` to `TRUE` or `FALSE` (default) but would like to use the sensible default of removing an intercept when there is one, you can set `remove_intercept=NULL`. A useful wrapper function which uses this as a default is `contr.hypothesis`:
+
+```{r}
+contr.hypothesis(trtC) # removes column `base` column
+contr.hypothesis(helC) # removes nothing
+```
+
+`contr.hypothesis` can also come in handy if you don't really need the `hypr` object but would only like to specify the hypotheses and return the contrast matrix. In that case, you can just use `contr.hypothesis` like the `hypr` function:
+
+```{r}
+contr.hypothesis(m1~0, m2~m1, m3~m1)
+contr.hypothesis(m2~m1, m3~(m1+m2)/2, m4~(m1+m2+m3)/3)
+```
+
+
