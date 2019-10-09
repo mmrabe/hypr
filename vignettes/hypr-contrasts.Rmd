@@ -10,7 +10,7 @@ output:
 editor_options: 
   chunk_output_type: console
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Using hypr to understand contrasts}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
