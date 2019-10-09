@@ -6,18 +6,22 @@
 \alias{contr.hypothesis}
 \title{Retrieve or set contrast matrix}
 \usage{
-cmat(x, add_intercept = FALSE, remove_intercept = FALSE)
+cmat(x, add_intercept = FALSE, remove_intercept = FALSE,
+  as_fractions = TRUE)
 
 cmat(x, add_intercept = FALSE, remove_intercept = FALSE) <- value
 
-contr.hypothesis(..., add_intercept = FALSE, remove_intercept = TRUE)
+contr.hypothesis(..., add_intercept = FALSE, remove_intercept = NULL,
+  as_fractions = FALSE)
 }
 \arguments{
 \item{x}{A hypr object}
 
 \item{add_intercept}{Add additional intercept column to contrast matrix}
 
-\item{remove_intercept}{Remove intercept column from contrast matrix (assumed to be the first column)}
+\item{remove_intercept}{If \code{TRUE}, tries to find an intercept column (all codes equal) and removes it from the matrix. If \code{NULL}, does the same but does not throw an exception if no intercept is found. \code{FALSE} explicitly disabled this functionality.}
+
+\item{as_fractions}{Should the returned matrix be formatted as fractions (using \code{\link[MASS:as.fractions]{MASS::as.fractions()}})?}
 
 \item{value}{contrast matrix}
 

@@ -393,6 +393,36 @@ setMethod("formula", signature(x="hypr"), function(x, ...) sapply(x@eqs, as.form
 #' @export
 setMethod("formula<-", signature(x="hypr"), function(x, ..., value) hypr(value))
 
+
+prepare_cmat <- function(value, add_intercept, remove_intercept) {
+  intercept_col <- which(apply(value, 2, function(col) all(col[-1] == col[1])))
+  if(add_intercept && remove_intercept) {
+    stop("Cannot add and remove intercept at the same time!")
+  } else if(add_intercept) {
+    if(length(intercept_col) > 0) {
+      warning(sprintf("You are using add_intercept=TRUE but it seems your contrast matrix already includes an intercept at contrast #%d!", intercept_col))
+    }
+    if(is.null(colnames(value))) {
+      value <- cbind(1, value)
+    } else {
+      value <- cbind(`Intercept` = 1, value)
+    }
+  } else if(isTRUE(remove_intercept) || is.null(remove_intercept)) {
+    if(length(intercept_col) == 0 && isTRUE(remove_intercept)) {
+      stop("You are using remove_intercept=TRUE but your contrast matrix does not have an obvious intercept! Please set remove_intercept=FALSE or specify with a number corresponding to the column index you want to remove, e.g. remove_intercept=1 for removing the first column.")
+    }
+    if(length(intercept_col) > 0) {
+      if(length(intercept_col) > 1) {
+        stop("You are using remove_intercept=TRUE but your contrast matrix does not have an obvious single intercept! Please set remove_intercept=FALSE or specify with a number corresponding to the column index you want to remove, e.g. remove_intercept=1 for removing the first column.")
+      }
+      value <- value[,-intercept_col,drop=F]
+    }
+  } else if(is.numeric(remove_intercept)) {
+    value <- value[,-remove_intercept,drop=F]
+  }
+  value
+}
+
 #' Retrieve or set contrast matrix
 #'
 #' Use these functions to retrieve or set a \code{hypr} object’s contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
@@ -400,7 +430,8 @@ setMethod("formula<-", signature(x="hypr"), function(x, ..., value) hypr(value))
 #' @param x A hypr object
 #' @param value contrast matrix
 #' @param add_intercept Add additional intercept column to contrast matrix
-#' @param remove_intercept Remove intercept column from contrast matrix (assumed to be the first column)
+#' @param remove_intercept If \code{TRUE}, tries to find an intercept column (all codes equal) and removes it from the matrix. If \code{NULL}, does the same but does not throw an exception if no intercept is found. \code{FALSE} explicitly disabled this functionality.
+#' @param as_fractions Should the returned matrix be formatted as fractions (using \code{\link[MASS:as.fractions]{MASS::as.fractions()}})?
 #' @param ... A list of hypothesis equations for which to retrieve a contrast matrix
 #' @rdname cmat
 #'
@@ -419,41 +450,28 @@ setMethod("formula<-", signature(x="hypr"), function(x, ..., value) hypr(value))
 #'
 #'
 #' @export
-cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
-  if(add_intercept && remove_intercept) {
-    stop("Cannot add and remove intercept at the same time!")
-  } else if(add_intercept) {
-    if(is.null(colnames(x@cmat))) {
-      MASS::as.fractions(cbind(1, x@cmat))
-    } else {
-      MASS::as.fractions(cbind(Intercept=1, x@cmat))
-    }
-  } else if(remove_intercept) {
-    MASS::as.fractions(x@cmat[,-1,drop=F])
+cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fractions = TRUE) {
+  if(!is(x, "hypr")) {
+    stop("`x` must be a hypr object!")
+  }
+  value <- prepare_cmat(x@cmat, add_intercept, remove_intercept)
+  if(isTRUE(as_fractions)) {
+    MASS::as.fractions(value)
   } else {
-    MASS::as.fractions(x@cmat)
+    value
   }
 }
 
 #' @describeIn cmat Set contrast matrix
 #' @export
 `cmat<-` <- function(x, add_intercept = FALSE, remove_intercept = FALSE, value) {
+  if(!is(x, "hypr")) {
+    stop("This can only be applied to hypr objects!")
+  }
   if(!is.matrix(value)) {
     stop("`value` must be a contrast matrix!")
   }
-  if(add_intercept && remove_intercept) {
-    stop("Cannot add and remove intercept at the same time!")
-  } else if(add_intercept) {
-    if(!is.matrix(value)) stop("add_intercept=TRUE can only be used with a matrix argument!")
-    if(is.null(colnames(value))) {
-      value <- cbind(1, value)
-    } else {
-      value <- cbind(`Intercept` = 1, value)
-    }
-  } else if(remove_intercept) {
-    if(!is.matrix(value)) stop("remove_intercept=TRUE can only be used with a matrix argument!")
-    value <- value[,-1,drop=F]
-  }
+  value <- prepare_cmat(value, add_intercept, remove_intercept)
   if(is.null(rownames(value))) {
     rownames(value) <- sprintf("mu%d", seq_len(nrow(value)))
   } else {
@@ -469,15 +487,17 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE) {
 
 #' @describeIn cmat Retrieve contrast matrix to override factor contrasts
 #' @export
-contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = TRUE) {
+contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL, as_fractions = FALSE) {
   args <- list(...)
   if(length(args) == 1 && is.numeric(args[[1]])) {
-    stop("`contr.hypothesis` cannot be used with a numeric argument. Please specify explicit hypotheses!")
-  } else if(length(args) == 1 && is(args[[1]], "hypr")) {
-    cmat(x = args[[1]], add_intercept = add_intercept, remove_intercept = remove_intercept)
-  } else {
-    cmat(x = hypr(...), add_intercept = add_intercept, remove_intercept = remove_intercept)
+    stop("`contr.hypothesis` cannot be used with a numeric argument. Please specify explicit hypotheses or pass a hypr object!")
   }
+  cmat(
+    x = if(length(args) == 1 && is(args[[1]], "hypr")) args[[1]] else do.call(hypr, args),
+    add_intercept = add_intercept,
+    remove_intercept = remove_intercept,
+    as_fractions = as_fractions
+  )
 }
 
 #' Enhanced generalized inverse function
