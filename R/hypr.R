@@ -10,7 +10,7 @@ NULL
 #' To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
 #'
 #' @param object,x a hypr object
-#' @param value A list of null hypothesis equations
+#' @param value New value (\code{list} of equations for \code{formula}, \code{character} vector for \code{levels} and \code{names})
 #' @param ... (ignored)
 #'
 #' @slot eqs List of null hypotheses
@@ -77,7 +77,7 @@ setMethod("show", "hypr", function(object) {
   }
 })
 
-parse_hypothesis <- function(expr, valid_terms = NULL, order_terms = FALSE) {
+parse_hypothesis <- function(expr, valid_terms = NULL) {
   if(!is.formula(expr)) {
     stop("`expr` must be a formula")
   }
@@ -109,8 +109,8 @@ check_names <- function(nvec) {
 #'
 #' @name conversions
 #' @param eqs A \code{list} of equations
-#' @param terms (optional) A \code{character} vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)
-#' @param order_terms (optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)
+#' @param levels (optional) A \code{character} vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)
+#' @param order_levels (optional) Whether to alphabetically order appearance of levels (rows in transposed hypothesis matrix or contrast matrix). Default is \code{TRUE} if \code{levels} were not explicitly provided.
 #' @param cmat Contrast matrix
 #' @param hmat Hypothesis matrix
 #' @param as_fractions (optional) Whether to output matrix using fractions formatting (via \code{\link[MASS:as.fractions]{MASS::as.fractions}}). Defaults to \code{TRUE}.
@@ -156,26 +156,26 @@ NULL
 #' @describeIn conversions Convert null hypothesis equations to hypothesis matrix
 #'
 #' @export
-eqs2hmat <- function(eqs, terms = NULL, order_terms = FALSE, as_fractions = TRUE) {
+eqs2hmat <- function(eqs, levels = NULL, order_levels = missing(levels), as_fractions = TRUE) {
   if(!is.list(eqs) || !all(vapply(eqs, function(x) is(x, "formula"), logical(1)))) {
     stop("`eqs` must be a list of formulas!")
   }
-  expr <- lapply(eqs, parse_hypothesis, valid_terms = terms, order_terms = order_terms)
-  expr2hmat(expr, terms = terms, order_terms = order_terms, as_fractions = as_fractions)
+  expr <- lapply(eqs, parse_hypothesis, valid_terms = levels)
+  expr2hmat(expr, levels = levels, order_levels = order_levels, as_fractions = as_fractions)
 }
 
-expr2hmat <- function(expr, terms = NULL, order_terms = FALSE, as_fractions = TRUE) {
-  if(is.null(terms)) {
-    terms <- unique(unlist(lapply(expr, function(h) unlist(lapply(h, function(x) x@var)))))
+expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fractions = TRUE) {
+  if(is.null(levels)) {
+    levels <- unique(unlist(lapply(expr, function(h) unlist(lapply(h, function(x) x@var)))))
   }
-  if(order_terms) {
-    terms <- sort(terms)
+  if(isTRUE(order_levels)) {
+    levels <- sort(levels)
   }
   if(!check_names(names(expr))) {
     stop("If equations are named, all must be named and names must be valid variable names in R!")
   }
   ret <- as.matrix(vapply(seq_along(expr), function(i) {
-    vapply(terms, function(j) {
+    vapply(levels, function(j) {
       for(el in expr[[i]]) {
         if(setequal_exact(el@var, j)) {
           return(as.fractions.expr_num(el@num))
@@ -183,8 +183,8 @@ expr2hmat <- function(expr, terms = NULL, order_terms = FALSE, as_fractions = TR
       }
       return(0)
     }, double(1))
-  }, double(length(terms))))
-  rownames(ret) <- terms
+  }, double(length(levels))))
+  rownames(ret) <- levels
   colnames(ret) <- names(expr)
   if(as_fractions)
     MASS::as.fractions(t(ret))
@@ -252,8 +252,8 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #' You may call the function without any arguments. In that case, an empty hypr object is returned. This is useful if you want to derive equations from a known hypothesis matrix or contrast matrix.
 #'
 #' @param ... A list of null hypothesis equations
-#' @param terms (Optional) A list of terms to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a term that is not in this vector.
-#' @param order_terms (Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically
+#' @param levels (Optional) A list of terms/levels to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a level that is not in this vector.
+#' @param order_levels (Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically. Default is \code{TRUE} if \code{levels} were not explicitly provided.
 #'
 #' @return A \code{hypr} object
 #'
@@ -276,7 +276,7 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #' h
 #'
 #' @export
-hypr <- function(..., terms = NULL, order_terms = FALSE) {
+hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   hyps = list(...)
   if(length(hyps) == 0) {
     return(new("hypr"))
@@ -286,8 +286,8 @@ hypr <- function(..., terms = NULL, order_terms = FALSE) {
   if(!all(vapply(hyps, is.formula, logical(1)))) {
     stop("Arguments to hypr() must be formulas or a list() of those.")
   }
-  parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = terms, order_terms = order_terms)
-  hmat <- expr2hmat(parsed_hypotheses, terms = terms, order_terms = order_terms, as_fractions = FALSE)
+  parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = levels)
+  hmat <- expr2hmat(parsed_hypotheses, levels = levels, order_levels = order_levels, as_fractions = FALSE)
   cmat <- hmat2cmat(hmat, as_fractions = FALSE)
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
 }
@@ -350,12 +350,42 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
   x
 }
 
-#' @describeIn hypr Retrieve the terms (variable names) used in a \code{hypr} object
+#' @describeIn hypr Retrieve the levels (variable names) used in a \code{hypr} object
 #'
-#' @return A character vector of term names
+#' @return A character vector of level names
 #'
 #' @export
-setMethod("terms", signature(x="hypr"), function(x) rownames(hmat(x)))
+setMethod("levels", signature(x="hypr"), function(x) colnames(x@hmat))
+
+
+#' @describeIn hypr Retrieve the contrast names used in a \code{hypr} object
+#'
+#' @return A character vector of contrast names
+#'
+#' @export
+setMethod("names", signature(x="hypr"), function(x) rownames(x@hmat))
+
+
+#' @describeIn hypr Set the contrast names used in a \code{hypr} object
+#'
+#' @export
+setMethod("names<-", signature(x="hypr"), function(x, value) {
+  mat <- hmat(x)
+  rownames(mat) <- value
+  `hmat<-`(hypr(), mat)
+})
+
+
+#' @describeIn hypr Set the levels used in a \code{hypr} object
+#'
+#' @export
+setMethod("levels<-", signature(x="hypr"), function(x, value) {
+  mat <- hmat(x)
+  colnames(mat) <- value
+  `hmat<-`(hypr(), mat)
+})
+
+
 
 #' Manipulate the formulas of an S4 object
 #'
@@ -435,7 +465,7 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
 #' @param ... A list of hypothesis equations for which to retrieve a contrast matrix
 #' @rdname cmat
 #'
-#' @return A \code{matrix} of contrast codes with contrasts as columns and terms as rows.
+#' @return A \code{matrix} of contrast codes with contrasts as columns and levels as rows.
 #'
 #' @examples
 #'

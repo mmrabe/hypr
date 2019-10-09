@@ -10,7 +10,8 @@
 \alias{cmat2eqs}
 \title{Shorthand versions for simple hypothesis translation}
 \usage{
-eqs2hmat(eqs, terms = NULL, order_terms = FALSE, as_fractions = TRUE)
+eqs2hmat(eqs, levels = NULL, order_levels = missing(levels),
+  as_fractions = TRUE)
 
 eqs2cmat(eqs, as_fractions = TRUE)
 
@@ -25,9 +26,9 @@ cmat2eqs(cmat, as_fractions = TRUE)
 \arguments{
 \item{eqs}{A \code{list} of equations}
 
-\item{terms}{(optional) A \code{character} vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)}
+\item{levels}{(optional) A \code{character} vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)}
 
-\item{order_terms}{(optional) Whether to alphabetically order appearance of terms (rows in transposed hypothesis matrix or contrast matrix)}
+\item{order_levels}{(optional) Whether to alphabetically order appearance of levels (rows in transposed hypothesis matrix or contrast matrix). Default is \code{TRUE} if \code{levels} were not explicitly provided.}
 
 \item{as_fractions}{(optional) Whether to output matrix using fractions formatting (via \code{\link[MASS:as.fractions]{MASS::as.fractions}}). Defaults to \code{TRUE}.}
 

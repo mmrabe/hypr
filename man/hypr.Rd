@@ -4,14 +4,14 @@
 \alias{hypr}
 \title{Create a hypr object}
 \usage{
-hypr(..., terms = NULL, order_terms = FALSE)
+hypr(..., levels = NULL, order_levels = missing(levels))
 }
 \arguments{
 \item{...}{A list of null hypothesis equations}
 
-\item{terms}{(Optional) A list of terms to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a term that is not in this vector.}
+\item{levels}{(Optional) A list of terms/levels to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a level that is not in this vector.}
 
-\item{order_terms}{(Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically}
+\item{order_levels}{(Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically. Default is \code{TRUE} if \code{levels} were not explicitly provided.}
 }
 \value{
 A \code{hypr} object

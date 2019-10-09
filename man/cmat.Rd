@@ -28,7 +28,7 @@ contr.hypothesis(..., add_intercept = FALSE, remove_intercept = NULL,
 \item{...}{A list of hypothesis equations for which to retrieve a contrast matrix}
 }
 \value{
-A \code{matrix} of contrast codes with contrasts as columns and terms as rows.
+A \code{matrix} of contrast codes with contrasts as columns and levels as rows.
 }
 \description{
 Use these functions to retrieve or set a \code{hypr} object’s contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.

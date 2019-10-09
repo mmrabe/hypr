@@ -4,14 +4,23 @@
 \name{hypr-class}
 \alias{hypr-class}
 \alias{show,hypr-method}
-\alias{terms,hypr-method}
+\alias{levels,hypr-method}
+\alias{names,hypr-method}
+\alias{names<-,hypr-method}
+\alias{levels<-,hypr-method}
 \alias{formula,hypr-method}
 \alias{formula<-,hypr-method}
 \title{S4 class “hypr” and its methods}
 \usage{
 \S4method{show}{hypr}(object)
 
-\S4method{terms}{hypr}(x)
+\S4method{levels}{hypr}(x)
+
+\S4method{names}{hypr}(x)
+
+\S4method{names}{hypr}(x) <- value
+
+\S4method{levels}{hypr}(x) <- value
 
 \S4method{formula}{hypr}(x, ...)
 
@@ -20,12 +29,14 @@
 \arguments{
 \item{object, x}{a hypr object}
 
-\item{...}{(ignored)}
+\item{value}{New value (\code{list} of equations for \code{formula}, \code{character} vector for \code{levels} and \code{names})}
 
-\item{value}{A list of null hypothesis equations}
+\item{...}{(ignored)}
 }
 \value{
-A character vector of term names
+A character vector of level names
+
+A character vector of contrast names
 
 A \code{list} of null hypothesis equations
 }
@@ -39,7 +50,13 @@ To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
 \itemize{
 \item \code{show}: Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
 
-\item \code{terms}: Retrieve the terms (variable names) used in a \code{hypr} object
+\item \code{levels}: Retrieve the levels (variable names) used in a \code{hypr} object
+
+\item \code{names}: Retrieve the contrast names used in a \code{hypr} object
+
+\item \code{names<-}: Set the contrast names used in a \code{hypr} object
+
+\item \code{levels<-}: Set the levels used in a \code{hypr} object
 
 \item \code{formula}: Retrieve a \code{hypr} object’s null hypothesis equations.
 
