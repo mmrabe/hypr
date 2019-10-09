@@ -33,6 +33,9 @@ A \code{matrix} of contrast codes with contrasts as columns and levels as rows.
 \description{
 Use these functions to retrieve or set a \code{hypr} object’s contrast matrix. If used for updating, the hypothesis matrix and equations are derived automatically.
 }
+\details{
+Basic specification of contrasts in R is accomplished with basic R functions \code{\link[stats:contrasts]{stats::contrasts()}} and \code{\link[stats:C]{stats::C()}} (Chambers & Hastie, 1992). Other relevant packages for this topic are \code{multcomp} (Bretz et al., 2010), \code{contrast} (Kuhn et al., 2016), and, including also various vignettes, \code{emmeans} (Lenth, 2019).
+}
 \section{Functions}{
 \itemize{
 \item \code{cmat<-}: Set contrast matrix
@@ -48,8 +51,13 @@ cmat(h) # retrieve the contrast matrix
 contr.hypothesis(h) # by default without intercept (removes first column)
 contr.hypothesis(mu1~0, mu2~mu1)
 
-h2 <- hypr()
-cmat(h2) <- cmat(h) # copy contrast matrix to other hypr object
+}
+\references{
+Chambers, J. M. and Hastie, T. J. (1992) \emph{Statistical models}. Chapter 2 of \emph{Statistical Models} in S eds J. M. Chambers and T. J. Hastie, Wadsworth & Brooks/Cole.
 
+Frank Bretz, Torsten Hothorn and Peter Westfall (2010), \emph{Multiple Comparisons Using R}, CRC Press, Boca Raton.
 
+Max Kuhn, contributions from Steve Weston, Jed Wing, James Forester and Thorn Thaler (2016). \emph{contrast: A Collection of Contrast Methods}. R package version 0.21. \url{https://CRAN.R-project.org/package=contrast}
+
+Lenth, R. (2019). \emph{emmeans: Estimated Marginal Means, aka Least-Squares Means}. R package version 1.4.1. \url{https://CRAN.R-project.org/package=emmeans}
 }

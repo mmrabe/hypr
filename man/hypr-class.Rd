@@ -93,6 +93,7 @@ cmat(h4) <- cmat(h)
 # ... over to another hypr object is the same as copying the object:
 h5 <- h
 
+# check that hypr objects are equal by comparing hmat() and cmat()
 stopifnot(all.equal(hmat(h), hmat(h2)))
 stopifnot(all.equal(cmat(h), cmat(h2)))
 stopifnot(all.equal(hmat(h), hmat(h3)))
