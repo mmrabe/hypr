@@ -505,7 +505,7 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = TRUE
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {
   if(!is.matrix(x) || !is.numeric(x)) stop("`x` must be a numeric matrix!")
-  y <- round(MASS::ginv(x), -log10(.Machine$double.neg.eps*10))
+  y <- round(MASS::ginv(x), floor(-log10(.Machine$double.neg.eps) - 3))
   dimnames(y) <- dimnames(x)[2:1]
   if(as_fractions) MASS::fractions(y) else y
 }
