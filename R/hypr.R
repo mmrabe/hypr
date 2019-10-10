@@ -2,11 +2,11 @@
 #' @importFrom methods as is new show
 NULL
 
+
 check_argument <- function(val, ...) {
   val <- tryCatch(val, error = function(e) e)
   if(is(val, "error")) stop(val$message, call. = FALSE)
-  .call <- match.call()
-  argname <- as.character(.call$val)
+  argname <- as.character(as.expression(match.call()$val))
   if(length(argname) > 1) stop("Must be single character")
   for(tst in list(...)) {
     if(is.numeric(tst) && is.vector(val)) {
@@ -29,20 +29,20 @@ check_argument <- function(val, ...) {
         stop(sprintf("`%s` must be of type %s but is %s.", argname, paste(tst, collapse=","), paste(class(val), collapse=",")), call. = FALSE)
       }
     } else if(is.function(tst)) {
-      if(!tst(val)) {
+      if(!all(tst(val))) {
         stop(sprintf("`%s` has an invalid value.", argname), call. = FALSE)
       }
     } else if(is.expression(tst)) {
-      if(!isTRUE(eval(tst, list(x = val)))) {
-        test_string <- if(tst[[1]][[1]] == "<") {
+      if(!isTRUE(all(eval(tst, list(x = val))))) {
+        test_string <- if(tst[[1]][[1]] == "<" && tst[[1]][[2]] == "x") {
           sprintf("be smaller than %s", as.character(tst[[1]][[3]]))
-        } else if(tst[[1]][[1]] == "<=") {
+        } else if(tst[[1]][[1]] == "<=" && tst[[1]][[2]] == "x") {
           sprintf("be smaller than or equal to %s", as.character(tst[[1]][[3]]))
-        } else if(tst[[1]][[1]] == ">") {
+        } else if(tst[[1]][[1]] == ">" && tst[[1]][[2]] == "x") {
           sprintf("be greater than %s", as.character(tst[[1]][[3]]))
-        } else if(tst[[1]][[1]] == ">=") {
+        } else if(tst[[1]][[1]] == ">=" && tst[[1]][[2]] == "x") {
           sprintf("be greater than or equal to %s", as.character(tst[[1]][[3]]))
-        } else if(tst[[1]][[1]] == "==") {
+        } else if(tst[[1]][[1]] == "==" && tst[[1]][[2]] == "x") {
           sprintf("be equal to %s", as.character(tst[[1]][[3]]))
         } else {
           sprintf("satisfy %s", as.character(tst))
@@ -52,6 +52,7 @@ check_argument <- function(val, ...) {
     }
   }
 }
+
 
 #' S4 class “hypr” and its methods
 #'
