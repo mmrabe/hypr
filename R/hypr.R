@@ -3,16 +3,29 @@
 NULL
 
 check_argument <- function(val, ...) {
-  val
+  val <- tryCatch(val, error = function(e) e)
+  if(is(val, "error")) stop(val$message, call. = FALSE)
   .call <- match.call()
   argname <- as.character(.call$val)
   if(length(argname) > 1) stop("Must be single character")
   for(tst in list(...)) {
-    if(is.character(tst)) {
-      if("number" %in% tst) {
-        tst <- unique(c(tst[tst!="number"], "numeric", "integer"))
+    if(is.numeric(tst) && is.vector(val)) {
+      if(length(val) != tst) {
+        stop(sprintf("`%s` has a length of %d but must contain exactly %d items.", argname, length(val), tst))
       }
-      if(!any(class(val) %in% tst)) {
+    } else if(is.character(tst)) {
+      classValid <- FALSE
+      for(cls in tst) {
+        if(cls == "numeric" && is.numeric(val)) {
+          classValid <- TRUE
+        } else if(grepl("^list:", cls)) {
+          classValid <- is.list(val) && all(vapply(val, function(x) is(x, substring(cls, 6)), logical(1)))
+        } else {
+          classValid <- is(val, cls)
+        }
+        if(classValid) break
+      }
+      if(!classValid) {
         stop(sprintf("`%s` must be of type %s but is %s.", argname, paste(tst, collapse=","), paste(class(val), collapse=",")), call. = FALSE)
       }
     } else if(is.function(tst)) {
@@ -197,25 +210,19 @@ NULL
 #'
 #' @export
 eqs2hmat <- function(eqs, levels = NULL, order_levels = missing(levels), as_fractions = TRUE) {
-  check_argument(eqs, "list")
+  check_argument(eqs, "list:formula")
   check_argument(levels, c("NULL", "character"))
-  check_argument(order_levels, "logical")
-  check_argument(as_fractions, "logical")
-  if(!all(vapply(eqs, function(x) is(x, "formula"), logical(1)))) {
-    stop("`eqs` must be a list of formulas!")
-  }
+  check_argument(order_levels, "logical", 1)
+  check_argument(as_fractions, "logical", 1)
   expr <- lapply(eqs, parse_hypothesis, valid_terms = levels)
   expr2hmat(expr, levels = levels, order_levels = order_levels, as_fractions = as_fractions)
 }
 
 expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fractions = TRUE) {
-  check_argument(expr, "list")
-  if(!all(vapply(expr, function(x) is(x, "expr_sum"), logical(1)))) {
-    stop("`expr` must be a list of expr_sums!")
-  }
+  check_argument(expr, "list:expr_sum")
   check_argument(levels, c("NULL", "character"))
-  check_argument(order_levels, "logical")
-  check_argument(as_fractions, "logical")
+  check_argument(order_levels, "logical", 1)
+  check_argument(as_fractions, "logical", 1)
   if(is.null(levels)) {
     levels <- unique(unlist(lapply(expr, function(h) unlist(lapply(h, function(x) x@var)))))
   }
@@ -261,8 +268,8 @@ cmat2hmat <- function(cmat, as_fractions = TRUE) {
 hmat2eqs <- function(hmat, as_fractions = TRUE) sapply(hmat2expr(hmat, as_fractions = as_fractions), as.formula.expr_sum, simplify = FALSE)
 
 hmat2expr <- function(hmat, as_fractions = TRUE) {
-  check_argument(hmat, "matrix")
-  check_argument(as_fractions, "logical")
+  check_argument(hmat, "matrix", "numeric")
+  check_argument(as_fractions, "logical", 1)
   ret <- lapply(seq_len(nrow(hmat)), function(j) {
     simplify_expr_sum(
       as(lapply(seq_len(ncol(hmat)), function(i) {
@@ -341,7 +348,7 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   hyps = list(...)
   check_argument(levels, c("NULL","character"))
-  check_argument(order_levels, "logical")
+  check_argument(order_levels, "logical", 1)
   if(length(hyps) == 0) {
     return(new("hypr"))
   } else if(length(hyps) == 1 && is.list(hyps[[1]])) {
@@ -400,7 +407,7 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
 #' @export
 `hmat<-` <- function(x, value) {
   check_argument(x, "hypr")
-  check_argument(value, "matrix", is.numeric)
+  check_argument(value, "matrix", "numeric")
   if(!check_names(colnames(value))) {
     colnames(value) <- make.names(colnames(value))
   }
@@ -522,6 +529,9 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
     }
     if(is.null(colnames(value))) {
       value <- cbind(1, value)
+    } else if(is.character(add_intercept)) {
+      value <- cbind(1, value)
+      colnames(value)[1] <- add_intercept
     } else {
       value <- cbind(`Intercept` = 1, value)
     }
@@ -580,9 +590,9 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
 #' @export
 cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fractions = TRUE) {
   check_argument(x, "hypr")
-  check_argument(add_intercept, "logical")
-  check_argument(remove_intercept, c("NULL","logical"))
-  check_argument(as_fractions, "logical")
+  check_argument(add_intercept, "logical", 1)
+  check_argument(remove_intercept, c("NULL","logical"), 1)
+  check_argument(as_fractions, "logical", 1)
   value <- prepare_cmat(x@cmat, add_intercept, remove_intercept)
   if(isTRUE(as_fractions)) {
     MASS::as.fractions(value)
@@ -595,9 +605,9 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
 #' @export
 `cmat<-` <- function(x, add_intercept = FALSE, remove_intercept = FALSE, value) {
   check_argument(x, "hypr")
-  check_argument(add_intercept, "logical")
-  check_argument(remove_intercept, c("NULL","logical"))
-  check_argument(value, "matrix", is.numeric)
+  check_argument(add_intercept, "logical", 1)
+  check_argument(remove_intercept, c("NULL","logical"), 1)
+  check_argument(value, "matrix", "numeric")
   if(!check_names(colnames(value))) {
     rownames(value) <- make.names(rownames(value))
   }
@@ -654,8 +664,8 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
 #'
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {
-  if(!is.matrix(x) || !is.numeric(x)) stop("`x` must be a numeric matrix!")
-  check_argument(as_fractions, "logical")
+  check_argument(x, "matrix", "numeric")
+  check_argument(as_fractions, "logical", 1)
   y <- round(MASS::ginv(x), floor(-log10(.Machine$double.neg.eps) - 3))
   dimnames(y) <- dimnames(x)[2:1]
   if(isTRUE(as_fractions)) MASS::fractions(y) else y
