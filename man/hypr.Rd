@@ -61,5 +61,5 @@ Max Kuhn, contributions from Steve Weston, Jed Wing, James Forester and Thorn Th
 Lenth, R. (2019). \emph{emmeans: Estimated Marginal Means, aka Least-Squares Means}. R package version 1.4.1. \url{https://CRAN.R-project.org/package=emmeans}
 }
 \seealso{
-S4 class \code{\link[hypr:hypr-class]{hypr}}, \code{\link[stats]{contrasts}}, \code{\link[stats]{C}}
+\code{\link[stats]{contrasts}} and \code{\link[stats]{C}} for basic specification of contrasts in R, S4 class \code{\link[hypr:hypr-class]{hypr}}, \code{\link[hypr]{cmat}}, \code{\link[hypr]{contr.hypothesis}} for retrieval of contrast matrices from \code{hypr} objects
 }

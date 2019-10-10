@@ -29,7 +29,7 @@ For a general introduction to `hypr`, see the `hypr-intro` vignette:
 vignette("hypr-intro", package = "hypr")
 ```
 
-For an introduction to using `hypr` for contrast coding in regression models, see the `hypr-contrasts` vignette:
+For an introduction to using `hypr` for contrast coding in regression models, see the `hypr-regression` vignette:
 ```{r, eval = FALSE}
 vignette("hypr-regression", package = "hypr")
 ```
@@ -44,7 +44,7 @@ Even though this is a simple coding scheme, it might not be immediately clear to
 contr.treatment(4) # a contrast matrix for one baseline and 3 treatments
 ```
 
-To understand wat this contrast is testing, we can create an empty `hypr` object and set its contrast matrix to the one above:
+To understand what this contrast is testing, we can create an empty `hypr` object and set its contrast matrix to the one above:
 
 ```{r}
 h <- hypr()

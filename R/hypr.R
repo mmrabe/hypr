@@ -248,7 +248,7 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #'
 #' @return A \code{hypr} object
 #'
-#' @seealso S4 class \code{\link[hypr:hypr-class]{hypr}}, \code{\link[stats]{contrasts}}, \code{\link[stats]{C}}
+#' @seealso \code{\link[stats]{contrasts}} and \code{\link[stats]{C}} for basic specification of contrasts in R, S4 class \code{\link[hypr:hypr-class]{hypr}}, \code{\link[hypr]{cmat}}, \code{\link[hypr]{contr.hypothesis}} for retrieval of contrast matrices from \code{hypr} objects
 #'
 #' @references
 #' Chambers, J. M. and Hastie, T. J. (1992) \emph{Statistical models}. Chapter 2 of \emph{Statistical Models} in S eds J. M. Chambers and T. J. Hastie, Wadsworth & Brooks/Cole.
@@ -488,12 +488,12 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
 #' @param x A hypr object
 #' @param value contrast matrix
 #' @param add_intercept Add additional intercept column to contrast matrix
-#' @param remove_intercept If \code{TRUE}, tries to find an intercept column (all codes equal) and removes it from the matrix. If \code{NULL}, does the same but does not throw an exception if no intercept is found. \code{FALSE} explicitly disabled this functionality.
+#' @param remove_intercept If \code{TRUE}, tries to find an intercept column (all codes equal) and removes it from the matrix. If \code{NULL}, does the same but does not throw an exception if no intercept is found. \code{FALSE} explicitly disables this functionality. A numeric argument explicitly identifies the index of the column to be removed.
 #' @param as_fractions Should the returned matrix be formatted as fractions (using \code{\link[MASS:as.fractions]{MASS::as.fractions()}})?
 #' @param ... A list of hypothesis equations for which to retrieve a contrast matrix
 #' @rdname cmat
 #'
-#'
+#' @seealso \code{\link[hypr]{hypr}}
 #'
 #' @return A \code{matrix} of contrast codes with contrasts as columns and levels as rows.
 #'
