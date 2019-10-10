@@ -2,6 +2,43 @@
 #' @importFrom methods as is new show
 NULL
 
+check_argument <- function(val, ...) {
+  val
+  .call <- match.call()
+  argname <- as.character(.call$val)
+  if(length(argname) > 1) stop("Must be single character")
+  for(tst in list(...)) {
+    if(is.character(tst)) {
+      if("number" %in% tst) {
+        tst <- unique(c(tst[tst!="number"], "numeric", "integer"))
+      }
+      if(!any(class(val) %in% tst)) {
+        stop(sprintf("`%s` must be of type %s but is %s.", argname, paste(tst, collapse=","), paste(class(val), collapse=",")), call. = FALSE)
+      }
+    } else if(is.function(tst)) {
+      if(!tst(val)) {
+        stop(sprintf("`%s` has an invalid value.", argname), call. = FALSE)
+      }
+    } else if(is.expression(tst)) {
+      if(!isTRUE(eval(tst, list(x = val)))) {
+        test_string <- if(tst[[1]][[1]] == "<") {
+          sprintf("be smaller than %s", as.character(tst[[1]][[3]]))
+        } else if(tst[[1]][[1]] == "<=") {
+          sprintf("be smaller than or equal to %s", as.character(tst[[1]][[3]]))
+        } else if(tst[[1]][[1]] == ">") {
+          sprintf("be greater than %s", as.character(tst[[1]][[3]]))
+        } else if(tst[[1]][[1]] == ">=") {
+          sprintf("be greater than or equal to %s", as.character(tst[[1]][[3]]))
+        } else if(tst[[1]][[1]] == "==") {
+          sprintf("be equal to %s", as.character(tst[[1]][[3]]))
+        } else {
+          sprintf("satisfy %s", as.character(tst))
+        }
+        stop(sprintf("`%s` must %s!", argname, test_string), call. = FALSE)
+      }
+    }
+  }
+}
 
 #' S4 class “hypr” and its methods
 #'
@@ -52,10 +89,8 @@ NULL
 #'
 setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 
-#' @describeIn hypr Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
-#'
-#' @export
-setMethod("show", "hypr", function(object) {
+show.hypr <- function(object) {
+  check_argument(object, "hypr")
   if(length(object@eqs) == 0) {
     cat("This hypr object does not contain hypotheses.")
   } else {
@@ -76,12 +111,16 @@ setMethod("show", "hypr", function(object) {
     cat("\nContrast matrix:\n")
     show(cmat(object))
   }
-})
+}
+
+#' @describeIn hypr Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
+#'
+#' @export
+setMethod("show", "hypr", show.hypr)
 
 parse_hypothesis <- function(expr, valid_terms = NULL) {
-  if(!is.formula(expr)) {
-    stop("`expr` must be a formula")
-  }
+  check_argument(expr, c("expression","formula","call"))
+  check_argument(valid_terms, c("NULL","character"))
   ret <- simplify_expr_sum(simplify_expr(call("-",expr[[2]],expr[[3]])))
   for(el in ret) {
     if(length(el@var) == 0) {
@@ -158,7 +197,11 @@ NULL
 #'
 #' @export
 eqs2hmat <- function(eqs, levels = NULL, order_levels = missing(levels), as_fractions = TRUE) {
-  if(!is.list(eqs) || !all(vapply(eqs, function(x) is(x, "formula"), logical(1)))) {
+  check_argument(eqs, "list")
+  check_argument(levels, c("NULL", "character"))
+  check_argument(order_levels, "logical")
+  check_argument(as_fractions, "logical")
+  if(!all(vapply(eqs, function(x) is(x, "formula"), logical(1)))) {
     stop("`eqs` must be a list of formulas!")
   }
   expr <- lapply(eqs, parse_hypothesis, valid_terms = levels)
@@ -166,6 +209,13 @@ eqs2hmat <- function(eqs, levels = NULL, order_levels = missing(levels), as_frac
 }
 
 expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fractions = TRUE) {
+  check_argument(expr, "list")
+  if(!all(vapply(expr, function(x) is(x, "expr_sum"), logical(1)))) {
+    stop("`expr` must be a list of expr_sums!")
+  }
+  check_argument(levels, c("NULL", "character"))
+  check_argument(order_levels, "logical")
+  check_argument(as_fractions, "logical")
   if(is.null(levels)) {
     levels <- unique(unlist(lapply(expr, function(h) unlist(lapply(h, function(x) x@var)))))
   }
@@ -211,6 +261,8 @@ cmat2hmat <- function(cmat, as_fractions = TRUE) {
 hmat2eqs <- function(hmat, as_fractions = TRUE) sapply(hmat2expr(hmat, as_fractions = as_fractions), as.formula.expr_sum, simplify = FALSE)
 
 hmat2expr <- function(hmat, as_fractions = TRUE) {
+  check_argument(hmat, "matrix")
+  check_argument(as_fractions, "logical")
   ret <- lapply(seq_len(nrow(hmat)), function(j) {
     simplify_expr_sum(
       as(lapply(seq_len(ncol(hmat)), function(i) {
@@ -288,6 +340,8 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #' @export
 hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   hyps = list(...)
+  check_argument(levels, c("NULL","character"))
+  check_argument(order_levels, "logical")
   if(length(hyps) == 0) {
     return(new("hypr"))
   } else if(length(hyps) == 1 && is.list(hyps[[1]])) {
@@ -345,9 +399,8 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
 #' @describeIn hmat Set hypothesis matrix
 #' @export
 `hmat<-` <- function(x, value) {
-  if(!is.matrix(value) || !is.numeric(value)) {
-    stop("`value` must be a numeric matrix!")
-  }
+  check_argument(x, "hypr")
+  check_argument(value, "matrix", is.numeric)
   if(!check_names(colnames(value))) {
     colnames(value) <- make.names(colnames(value))
   }
@@ -366,40 +419,55 @@ thmat <- function(x, as_fractions = TRUE) t(hmat(x, as_fractions = as_fractions)
   x
 }
 
+levels.hypr <- function(x) {
+  check_argument(x, "hypr")
+  colnames(x@hmat)
+}
+
 #' @describeIn hypr Retrieve the levels (variable names) used in a \code{hypr} object
 #'
 #' @return A character vector of level names
 #'
 #' @export
-setMethod("levels", signature(x="hypr"), function(x) colnames(x@hmat))
+setMethod("levels", signature(x="hypr"), levels.hypr)
 
+names.hypr <- function(x) {
+  check_argument(x, "hypr")
+  rownames(x@hmat)
+}
 
 #' @describeIn hypr Retrieve the contrast names used in a \code{hypr} object
 #'
 #' @return A character vector of contrast names
 #'
 #' @export
-setMethod("names", signature(x="hypr"), function(x) rownames(x@hmat))
+setMethod("names", signature(x="hypr"), names.hypr)
 
+`names<-.hypr` <- function(x, value) {
+  check_argument(x, "hypr")
+  check_argument(value, c("NULL","character"))
+  mat <- hmat(x)
+  rownames(mat) <- value
+  `hmat<-`(hypr(), mat)
+}
 
 #' @describeIn hypr Set the contrast names used in a \code{hypr} object
 #'
 #' @export
-setMethod("names<-", signature(x="hypr"), function(x, value) {
-  mat <- hmat(x)
-  rownames(mat) <- value
-  `hmat<-`(hypr(), mat)
-})
+setMethod("names<-", signature(x="hypr"), `names<-.hypr`)
 
+`levels<-.hypr` <- function(x, value) {
+  check_argument(x, "hypr")
+  check_argument(value, c("NULL","character"))
+  mat <- hmat(x)
+  colnames(mat) <- value
+  `hmat<-`(hypr(), mat)
+}
 
 #' @describeIn hypr Set the levels used in a \code{hypr} object
 #'
 #' @export
-setMethod("levels<-", signature(x="hypr"), function(x, value) {
-  mat <- hmat(x)
-  colnames(mat) <- value
-  `hmat<-`(hypr(), mat)
-})
+setMethod("levels<-", signature(x="hypr"), `levels<-.hypr`)
 
 
 
@@ -414,6 +482,10 @@ setMethod("levels<-", signature(x="hypr"), function(x, value) {
 #'
 #' @export
 setGeneric("formula<-", function(x, ..., value) UseMethod("formula<-", x))
+
+formula.hypr <- function(x, ...) sapply(x@eqs, as.formula.expr_sum, simplify = FALSE)
+
+`formula<-.hypr` <- function(x, ..., value) hypr(value)
 
 #' @describeIn hypr Retrieve a \code{hypr} object’s null hypothesis equations.
 #'
@@ -433,11 +505,11 @@ setGeneric("formula<-", function(x, ..., value) UseMethod("formula<-", x))
 #' stopifnot(all.equal(cmat(h), cmat(h2)))
 #'
 #' @export
-setMethod("formula", signature(x="hypr"), function(x, ...) sapply(x@eqs, as.formula.expr_sum, simplify = FALSE))
+setMethod("formula", signature(x="hypr"), formula.hypr)
 
 #' @describeIn hypr Modify a \code{hypr} object’s null hypothesis equations
 #' @export
-setMethod("formula<-", signature(x="hypr"), function(x, ..., value) hypr(value))
+setMethod("formula<-", signature(x="hypr"), `formula<-.hypr`)
 
 
 prepare_cmat <- function(value, add_intercept, remove_intercept) {
@@ -507,9 +579,10 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
 #'
 #' @export
 cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fractions = TRUE) {
-  if(!is(x, "hypr")) {
-    stop("`x` must be a hypr object!")
-  }
+  check_argument(x, "hypr")
+  check_argument(add_intercept, "logical")
+  check_argument(remove_intercept, c("NULL","logical"))
+  check_argument(as_fractions, "logical")
   value <- prepare_cmat(x@cmat, add_intercept, remove_intercept)
   if(isTRUE(as_fractions)) {
     MASS::as.fractions(value)
@@ -521,12 +594,10 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
 #' @describeIn cmat Set contrast matrix
 #' @export
 `cmat<-` <- function(x, add_intercept = FALSE, remove_intercept = FALSE, value) {
-  if(!is(x, "hypr")) {
-    stop("This can only be applied to hypr objects!")
-  }
-  if(!is.matrix(value) || !is.numeric(value)) {
-    stop("`value` must be a numeric matrix!")
-  }
+  check_argument(x, "hypr")
+  check_argument(add_intercept, "logical")
+  check_argument(remove_intercept, c("NULL","logical"))
+  check_argument(value, "matrix", is.numeric)
   if(!check_names(colnames(value))) {
     rownames(value) <- make.names(rownames(value))
   }
@@ -584,7 +655,8 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {
   if(!is.matrix(x) || !is.numeric(x)) stop("`x` must be a numeric matrix!")
+  check_argument(as_fractions, "logical")
   y <- round(MASS::ginv(x), floor(-log10(.Machine$double.neg.eps) - 3))
   dimnames(y) <- dimnames(x)[2:1]
-  if(as_fractions) MASS::fractions(y) else y
+  if(isTRUE(as_fractions)) MASS::fractions(y) else y
 }
