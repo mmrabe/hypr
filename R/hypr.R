@@ -11,7 +11,7 @@ check_argument <- function(val, ...) {
   for(tst in list(...)) {
     if(is.numeric(tst) && is.vector(val)) {
       if(length(val) != tst) {
-        stop(sprintf("`%s` has a length of %d but must contain exactly %d items.", argname, length(val), tst))
+        stop(sprintf("`%s` has a length of %d but must have a length of %d.", argname, length(val), tst), call. = FALSE)
       }
     } else if(is.character(tst)) {
       classValid <- FALSE
