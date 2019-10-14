@@ -5,6 +5,8 @@ bibentry(
   year = 2019,
   journal = "Journal of Memory and Language",
   arXiv = "1807.10451",
+  doi = "10.1016/j.jml.2019.104038",
+  volume = 110,
   author = c(
     person(given = "Daniel J.", family = "Schad"),
     person(given = "Shravan", family = "Vasishth"),
