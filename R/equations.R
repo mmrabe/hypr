@@ -281,6 +281,8 @@ simplify_expr <- function(expr) {
         ret <- as(c(list(lh), rh), "expr_sum")
       } else if(is(lh, "expr_sum") && is(rh, "expr_coef")) {
         ret <- as(c(lh, list(rh)), "expr_sum")
+      } else if(is(lh, "expr_sum") && is(rh, "expr_sum")) {
+        ret <- as(c(lh, rh), "expr_sum")
       } else {
         stop(sprintf("Unknown summands %s and %s!", class(lh), class(rh)))
       }
