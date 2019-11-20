@@ -81,21 +81,20 @@ round(coef(summary(lm(DV ~ X, data=simdat))), 3)
 
 The linear regression returns the expected estimates: The intercept is the baseline condition and the three main effects are the differences between the baseline and the three conditions.
 
-## Example: Effect coding
+## Example: Sum contrast coding
 
 A sum contrast, such as used for ANOVA, with four levels could generate the following null hypotheses:
 
 \begin{align}
-H_{0_1}:& \; 0 = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} \\
-H_{0_2}:& \; 0 = \frac{3 \mu_1 - \mu_2 + \mu_3 + \mu_4}{4} \\
-H_{0_3}:& \; 0 = \frac{3 \mu_2 - \mu_1 + \mu_3 + \mu_4}{4} \\
-H_{0_4}:& \; 0 = \frac{3 \mu_3 - \mu_1 + \mu_2 + \mu_4}{4}
+H_{0_1}:& \; \mu_1 = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} \\
+H_{0_2}:& \; \mu_2 = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} \\
+H_{0_3}:& \; \mu_3 = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4}
 \end{align}
 
 We rewrite them into `hypr`:
 
 ```{r}
-sumC <- hypr((mu1+mu2+mu3+mu4)/4~0, (3*mu1-mu2-mu3-mu4)/4~0, (3*mu2-mu1-mu3-mu4)/4~0, (3*mu3-mu1-mu2-mu4)/4~0)
+sumC <- hypr(mu1 ~ (mu1+mu2+mu3+mu4)/4, mu2 ~ (mu1+mu2+mu3+mu4)/4, mu3 ~ (mu1+mu2+mu3+mu4)/4)
 sumC
 ```
 
@@ -110,10 +109,9 @@ Without creating the intermediate `hypr` object, you can also set the contrasts 
 
 ```{r}
 contrasts(simdat$X) <- contr.hypothesis(
-  (mu1+mu2+mu3+mu4)/4~0, 
-  (3*mu1-mu2-mu3-mu4)/4~0, 
-  (3*mu2-mu1-mu3-mu4)/4~0, 
-  (3*mu3-mu1-mu2-mu4)/4~0
+  mu1 ~ (mu1+mu2+mu3+mu4)/4, 
+  mu2 ~ (mu1+mu2+mu3+mu4)/4, 
+  mu3 ~ (mu1+mu2+mu3+mu4)/4
 )
 contrasts(simdat$X)
 ```
