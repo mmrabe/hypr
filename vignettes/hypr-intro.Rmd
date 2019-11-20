@@ -32,7 +32,7 @@ The `hypr()` function accepts any set of null hypothesis equations as comma-sepa
 trtC <- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
 ```
 
-If you want to provide names for contrasts, you can name the function arguments as follows but this is totally optional:
+If you want to provide names for contrasts, you can name the function arguments as follows but this is optional:
 
 ```{r}
 trtC <- hypr(base = mu0~0, trt1 = mu1~mu0, trt2 = mu2~mu0, trt3 = mu3~mu0)
@@ -96,7 +96,7 @@ cmat(helC, remove_intercept = TRUE) # throws an error
 Therefore, when you are unsure whether to set `remove_intercept` to `TRUE` or `FALSE` (default) but would like to use the sensible default of removing an intercept when there is one, you can set `remove_intercept=NULL`. A useful wrapper function which uses this as a default is `contr.hypothesis`:
 
 ```{r}
-contr.hypothesis(trtC) # removes column `base` column
+contr.hypothesis(trtC) # removes `base` column
 contr.hypothesis(helC) # removes nothing
 ```
 
