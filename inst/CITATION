@@ -1,29 +1,31 @@
 
-bibentry(
-  bibtype = "Article",
-  title = "How to capitalize on a priori contrasts in linear (mixed) models: A tutorial",
-  year = 2019,
-  journal = "Journal of Memory and Language",
-  arXiv = "1807.10451",
-  doi = "10.1016/j.jml.2019.104038",
-  volume = 110,
-  author = c(
-    person(given = "Daniel J.", family = "Schad"),
-    person(given = "Shravan", family = "Vasishth"),
-    person(given = "Sven", family = "Hohenstein"),
-    person(given = "Reinhold", family = "Kliegl")
-  )
-)
+c(
+  bibentry(
+    bibtype = "Article",
+    title = "How to capitalize on a priori contrasts in linear (mixed) models: A tutorial",
+    year = 2019,
+    journal = "Journal of Memory and Language",
+    arXiv = "1807.10451",
+    doi = "10.1016/j.jml.2019.104038",
+    volume = 110,
+    author = c(
+      person(given = "Daniel J.", family = "Schad"),
+      person(given = "Shravan", family = "Vasishth"),
+      person(given = "Sven", family = "Hohenstein"),
+      person(given = "Reinhold", family = "Kliegl")
+    )
+  ),
 
-bibentry(
-  bibtype = "Unpublished",
-  title = "Contrast coding in R using the hypr package",
-  year = 2019,
-  note = "Manuscript in preparation",
-  author = c(
-    person(given = "Maximilian M.", family = "Rabe"),
-    person(given = "Daniel J.", family = "Schad"),
-    person(given = "Shravan", family = "Vasishth"),
-    person(given = "Reinhold", family = "Kliegl")
+  bibentry(
+    bibtype = "Manual",
+    title = "hypr: Hypothesis matrix translation",
+    year = 2019,
+    note = "R package",
+    author = c(
+      person(given = "Maximilian M.", family = "Rabe"),
+      person(given = "Shravan", family = "Vasishth"),
+      person(given = "Sven", family = "Hohenstein"),
+      person(given = "Reinhold", family = "Kliegl"),
+      person(given = "Daniel J.", family = "Schad"))
   )
 )
