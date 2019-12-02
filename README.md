@@ -23,12 +23,14 @@ devtools::install_github("mmrabe/hypr", build_vignettes = TRUE)
 
 For a treatment contrast with a baseline and three treatment conditions:
 
+$$
 \begin{align}
 H_{0_1}:& \; \mu_1 = 0 \\
 H_{0_2}:& \; \mu_2 = \mu_1 \\
 H_{0_3}:& \; \mu_3 = \mu_1 \\
 H_{0_4}:& \; \mu_4 = \mu_1
 \end{align}
+$$
 
 
 ```r
@@ -135,12 +137,14 @@ testC
 
 The derived hypotheses can be rewritten as:
 
+$$
 \begin{align}
 H_{0_1}:& \; \mu_1 = 0 \\
 H_{0_2}:& \; \mu_2 = \mu_1 \\
 H_{0_3}:& \; \mu_3 = \mu_1 \\
 H_{0_4}:& \; \mu_4 = \mu_1
 \end{align}
+$$
 
 For more information, see `vignette("hypr-contrasts")`.
 
