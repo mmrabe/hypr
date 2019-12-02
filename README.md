@@ -23,14 +23,13 @@ devtools::install_github("mmrabe/hypr", build_vignettes = TRUE)
 
 For a treatment contrast with a baseline and three treatment conditions:
 
-$$
-\begin{align}
-H_{0_1}:& \; \mu_1 = 0 \\
-H_{0_2}:& \; \mu_2 = \mu_1 \\
-H_{0_3}:& \; \mu_3 = \mu_1 \\
-H_{0_4}:& \; \mu_4 = \mu_1
-\end{align}
-$$
+![](https://latex.codecogs.com/gif.latex?H_%7B0_1%7D:%20%5C;%20%5Cmu_1%20%3D%200)
+
+![](https://latex.codecogs.com/gif.latex?H_%7B0_2%7D:%20%5C;%20%5Cmu_2%20%3D%20%5Cmu_1)
+
+![](https://latex.codecogs.com/gif.latex?H_%7B0_3%7D:%20%5C;%20%5Cmu_3%20%3D%20%5Cmu_1)
+
+![](https://latex.codecogs.com/gif.latex?H_%7B0_4%7D:%20%5C;%20%5Cmu_4%20%3D%20%5Cmu_1)
 
 
 ```r
@@ -137,14 +136,13 @@ testC
 
 The derived hypotheses can be rewritten as:
 
-$$
-\begin{align}
-H_{0_1}:& \; \mu_1 = 0 \\
-H_{0_2}:& \; \mu_2 = \mu_1 \\
-H_{0_3}:& \; \mu_3 = \mu_1 \\
-H_{0_4}:& \; \mu_4 = \mu_1
-\end{align}
-$$
+![](https://latex.codecogs.com/gif.latex?H_%7B0_1%7D:%20%5C;%20%5Cmu_1%20%3D%200)
+
+![](https://latex.codecogs.com/gif.latex?H_%7B0_2%7D:%20%5C;%20%5Cmu_2%20%3D%20%5Cmu_1)
+
+![](https://latex.codecogs.com/gif.latex?H_%7B0_3%7D:%20%5C;%20%5Cmu_3%20%3D%20%5Cmu_1)
+
+![](https://latex.codecogs.com/gif.latex?H_%7B0_4%7D:%20%5C;%20%5Cmu_4%20%3D%20%5Cmu_1)
 
 For more information, see `vignette("hypr-contrasts")`.
 

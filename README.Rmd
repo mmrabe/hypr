@@ -1,6 +1,12 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(hypr)
+latexImg = function(latex){
+    link = paste0('https://latex.codecogs.com/gif.latex?',
+           gsub('\\=','%3D',URLencode(latex)))
+    link = gsub("(%..)","\\U\\1",link,perl=TRUE)
+    return(paste0('![](',link,')'))
+}
 ```
 # hypr
 
@@ -24,14 +30,13 @@ devtools::install_github("mmrabe/hypr", build_vignettes = TRUE)
 
 For a treatment contrast with a baseline and three treatment conditions:
 
-$$
-\begin{align}
-H_{0_1}:& \; \mu_1 = 0 \\
-H_{0_2}:& \; \mu_2 = \mu_1 \\
-H_{0_3}:& \; \mu_3 = \mu_1 \\
-H_{0_4}:& \; \mu_4 = \mu_1
-\end{align}
-$$
+`r latexImg("H_{0_1}: \\; \\mu_1 = 0")`
+
+`r latexImg("H_{0_2}: \\; \\mu_2 = \\mu_1")`
+
+`r latexImg("H_{0_3}: \\; \\mu_3 = \\mu_1")`
+
+`r latexImg("H_{0_4}: \\; \\mu_4 = \\mu_1")`
 
 ```{r}
 trtC <- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
@@ -79,14 +84,13 @@ testC
 
 The derived hypotheses can be rewritten as:
 
-$$
-\begin{align}
-H_{0_1}:& \; \mu_1 = 0 \\
-H_{0_2}:& \; \mu_2 = \mu_1 \\
-H_{0_3}:& \; \mu_3 = \mu_1 \\
-H_{0_4}:& \; \mu_4 = \mu_1
-\end{align}
-$$
+`r latexImg("H_{0_1}: \\; \\mu_1 = 0")`
+
+`r latexImg("H_{0_2}: \\; \\mu_2 = \\mu_1")`
+
+`r latexImg("H_{0_3}: \\; \\mu_3 = \\mu_1")`
+
+`r latexImg("H_{0_4}: \\; \\mu_4 = \\mu_1")`
 
 For more information, see `vignette("hypr-contrasts")`.
 
