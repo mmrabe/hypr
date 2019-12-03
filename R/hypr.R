@@ -255,13 +255,19 @@ eqs2cmat <- function(eqs, as_fractions = TRUE) hmat2cmat(eqs2hmat(eqs), as_fract
 #' @describeIn conversions Convert hypothesis matrix to contrast matrix
 #' @export
 hmat2cmat <- function(hmat, as_fractions = TRUE) {
-  ginv2(hmat, as_fractions = as_fractions)
+  if(nrow(hmat) > 0 && ncol(hmat) > 0)
+    ginv2(hmat, as_fractions = as_fractions)
+  else
+    matrix(0, ncol = 0, nrow = 0)
 }
 
 #' @describeIn conversions Convert contrast matrix to hypothesis matrix
 #' @export
 cmat2hmat <- function(cmat, as_fractions = TRUE) {
-  ginv2(cmat, as_fractions = as_fractions)
+  if(nrow(cmat) > 0 && ncol(cmat) > 0)
+    ginv2(cmat, as_fractions = as_fractions)
+  else
+    matrix(0, ncol = 0, nrow = 0)
 }
 
 #' @describeIn conversions Convert hypothesis matrix to null hypothesis equations
