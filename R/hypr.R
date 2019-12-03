@@ -358,6 +358,9 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   if(!all(vapply(hyps, is.formula, logical(1)))) {
     stop("Arguments to hypr() must be formulas or a list() of those.")
   }
+  if(!is.null(names(hyps)) && any(names(hyps) == "")) {
+    stop("If there is at least one named hypothesis, all must be named.")
+  }
   parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = levels)
   hmat <- expr2hmat(parsed_hypotheses, levels = levels, order_levels = order_levels, as_fractions = FALSE)
   cmat <- hmat2cmat(hmat, as_fractions = FALSE)
