@@ -364,6 +364,54 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
 }
 
+`+.hypr` <- function(e1, e2) {
+  check_argument(e1, "hypr")
+  check_argument(e2, "hypr")
+  hmat1 <- hmat(e1)
+  hmat2 <- hmat(e2)
+  new_cols <- union(colnames(hmat1), colnames(hmat2))
+  new_rows <- NULL
+  if(!is.null(rownames(hmat1)) && !is.null(rownames(hmat2))) {
+    dups <- intersect(rownames(hmat1), rownames(hmat2))
+    if(length(dups) == 0) {
+      new_rows <- c(rownames(hmat1), rownames(hmat2))
+    } else {
+      warning(sprintf("Contrast names are dropped because of duplicates: %s", paste(dups, collapse=", ")))
+    }
+  } else if(is.null(rownames(hmat1)) != is.null(rownames(hmat2))) {
+    warning("Contrast names are dropped because not all hypr objects contain named hypotheses.")
+  }
+  hmat0 <- matrix(0, nrow = nrow(hmat1) + nrow(hmat2), ncol = length(new_cols), dimnames = list(new_rows, new_cols))
+  hmat0[seq_len(nrow(hmat1)),colnames(hmat1)] <- hmat1
+  hmat0[seq_len(nrow(hmat2))+nrow(hmat1),colnames(hmat2)] <- hmat2
+  h0 <- hypr()
+  hmat(h0) <- hmat0
+  h0
+}
+
+#' Concatenate hypr objects
+#'
+#' You can concatenate one or more \code{hypr} objects, i.e. combine their hypothesis to a single \code{hypr} object, by adding them with the \code{+} operator.
+#'
+#' The resulting \code{hypr} object will contain all hypotheses of the constituting \code{hypr} objects but the resulting hypothesis and contrast matrices may differ. The result should be identical to creating a new \code{hypr} object with a list of hypotheses comprising all of the constituting hypr object’s hypotheses.
+#'
+#' @param e1,e2 \code{hypr} objects to concatenate
+#' @return The combined \code{hypr} object
+#'
+#' @examples
+#'
+#' (h1 <- hypr(a~i, b~i)) # a hypr object of two treatments
+#'
+#' (h2 <- hypr(i~0)) # an intercept-only hypr object
+#'
+#' hc <- h1 + h2
+#'
+#' hc
+#'
+#' @export
+#'
+setMethod("+", c("hypr","hypr"), `+.hypr`)
+
 #' Retrieve and set hypothesis matrix
 #'
 #' Use these functions to retrieve or set a hypr object's hypothesis matrix. If used for updating, the contrast matrix and equations are derived automatically.
