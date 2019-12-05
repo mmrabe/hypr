@@ -32,6 +32,9 @@ h <- hypr()
 # Treatment contrast:
 h <- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
 
+# Identical version:
+h <- hypr(~mu1, ~mu2-mu1, ~mu3-mu1, ~mu4-mu1)
+
 contr.hypothesis(h)
 
 

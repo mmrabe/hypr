@@ -135,7 +135,13 @@ setMethod("show", "hypr", show.hypr)
 parse_hypothesis <- function(expr, valid_terms = NULL) {
   check_argument(expr, c("expression","formula","call"))
   check_argument(valid_terms, c("NULL","character"))
-  ret <- simplify_expr_sum(simplify_expr(call("-",expr[[2]],expr[[3]])))
+  if(length(expr) == 2) {
+    ret <- simplify_expr_sum(simplify_expr(call("-", expr[[2]], 0)))
+  } else if(length(expr) == 3) {
+    ret <- simplify_expr_sum(simplify_expr(call("-", expr[[2]], expr[[3]])))
+  } else {
+    stop("Expression has an unusual length!")
+  }
   for(el in ret) {
     if(length(el@var) == 0) {
       stop("Equation should not have terms without variables!")
@@ -332,6 +338,9 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #'
 #' # Treatment contrast:
 #' h <- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
+#'
+#' # Identical version:
+#' h <- hypr(~mu1, ~mu2-mu1, ~mu3-mu1, ~mu4-mu1)
 #'
 #' contr.hypothesis(h)
 #'
