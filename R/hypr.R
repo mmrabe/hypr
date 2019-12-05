@@ -377,6 +377,10 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
     stop("If there is at least one named hypothesis, all must be named.")
   }
   parsed_hypotheses <- lapply(hyps, parse_hypothesis, valid_terms = levels)
+  which_empty <- which(vapply(parsed_hypotheses, function(x) length(x) == 0, FALSE))
+  if(length(which_empty) > 0) {
+    stop(sprintf("List contains at least one empty hypothesis: %s", paste(vapply(hyps, function(x) as.character(as.expression(x)), ""), collapse=", ")))
+  }
   hmat <- expr2hmat(parsed_hypotheses, levels = levels, order_levels = order_levels, as_fractions = FALSE)
   cmat <- hmat2cmat(hmat, as_fractions = FALSE)
   new("hypr", eqs = parsed_hypotheses, hmat = hmat, cmat = cmat)
