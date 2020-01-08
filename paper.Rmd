@@ -71,11 +71,11 @@ trtC
 
 As can be seen above, the object contains three research (null) hypotheses:
 
-$$\begin{align}
+\begin{align}
 H_{0_1}:& \; \mu_1 = 0 \\
 H_{0_2}:& \; \mu_2 = \mu_1 \\
 H_{0_3}:& \; \mu_3 = \mu_1
-\end{align}$$
+\end{align}
 
 In addition to storing the hypotheses, the function constructs a hypothesis matrix, which represents the coefficients of each respective term used in the hypothesis equations. The generalized inverse of that matrix is the corresponding contrast matrix.
 
@@ -107,11 +107,11 @@ sumC
 
 The derived research hypotheses can be rewritten as:
 
-$$\begin{align}
+\begin{align}
 H_{0_1}:&& \mu_1 & = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} \\
 H_{0_2}:&& \mu_2 & = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} \\
 H_{0_3}:&& \mu_3 & = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4}
-\end{align}$$
+\end{align}
 
 As to be expected for a sum contrast, the contrasts test all but one group against the mean of all groups.
 
