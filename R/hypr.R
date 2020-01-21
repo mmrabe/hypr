@@ -369,6 +369,10 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
     return(new("hypr"))
   } else if(length(hyps) == 1 && is.list(hyps[[1]])) {
     hyps <- hyps[[1]]
+  } else if(length(hyps) == 1 && is.matrix(hyps[[1]])) {
+    h <- hypr()
+    cmat(h) <- hyps[[1]]
+    return(h)
   }
   if(!all(vapply(hyps, is.formula, logical(1)))) {
     stop("Arguments to hypr() must be formulas or a list() of those.")
