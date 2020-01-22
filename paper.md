@@ -1,38 +1,40 @@
 ---
 title: 'hypr: An R package for hypothesis-driven contrast coding'
-tags:
-  - R
-  - psychology
-  - linguistics
-  - linear regression
-  - linear model
-  - statistics2
-  - research methods
-  - research hypotheses
 authors:
-  - name: Maximilian M. Rabe
-    orcid: 0000-0002-2556-5644
-    affiliation: 1
-  - name: Shravan Vasishth
-    orcid: 0000-0003-2027-1994
-    affiliation: 1
-  - name: Sven Hohenstein
-    orcid: 0000-0002-9708-1593
-    affiliation: 1
-  - name: Reinhold Kliegl
-    orcid: 0000-0002-0180-8488
-    affiliation: 1
-  - name: Daniel J. Schad
-    orcid: 0000-0003-2586-6823
-    affiliation: 1, 2
-affiliations:
- - name: University of Potsdam
-   index: 1
- - name: Tilburg University
-   index: 2
-date: 21 January 2020
+- affiliation: 1
+  name: Maximilian M. Rabe
+  orcid: 0000-0002-2556-5644
+- affiliation: 1
+  name: Shravan Vasishth
+  orcid: 0000-0003-2027-1994
+- affiliation: 1
+  name: Sven Hohenstein
+  orcid: 0000-0002-9708-1593
+- affiliation: 1
+  name: Reinhold Kliegl
+  orcid: 0000-0002-0180-8488
+- affiliation: 1, 2
+  name: Daniel J. Schad
+  orcid: 0000-0003-2586-6823
+date: "21 January 2020"
+output:
+  html_document:
+    df_print: paged
 bibliography: paper.bib
-
+tags:
+- R
+- psychology
+- linguistics
+- linear regression
+- linear model
+- statistics
+- research methods
+- research hypotheses
+affiliations:
+- index: 1
+  name: University of Potsdam
+- index: 2
+  name: Tilburg University
 ---
 
 
@@ -101,11 +103,11 @@ trtC
 
 The term `baseline` or $\mu_1$ represents the mean response in the baseline condition, while `trt1` and `trt2`, or $\mu_2$ and $\mu_3$, respectively, represent the means of the response in the two treatment conditions. As can be seen above, the object contains three research (null) hypotheses, which are represented as the three columns of the "Hypothesis matrix (transposed)". Hypothesis $H_{0_1}$ (i.e., the first column of the transposed hypothesis matrix) tests whether the baseline condition is significantly different from zero, while $H_{0_2}$ and $H_{0_3}$ (i.e., columns two and three) each test whether one of the two treatment conditions are significantly different from the baseline condition. These hypotheses can be formally specified as:
 
-\begin{align}
-H_{0_1}: && \mu_1 & = 0 \\
-H_{0_2}: && \mu_2 & = \mu_1 \\
-H_{0_3}: && \mu_3 & = \mu_1
-\end{align}
+\begin{align*}
+H_{0_1}: && \mu_1 & = 0 && \\
+H_{0_2}: && \mu_2 & = \mu_1 && \\
+H_{0_3}: && \mu_3 & = \mu_1 &&
+\end{align*}
 
 The *hypothesis matrix* contains the coefficient or weight of each of the group means in each of the hypotheses. Groups that are not part of a particular hypothesis have a weight of zero. The generalized inverse of the hypothesis matrix yields the desired *contrast matrix*.
 
@@ -185,11 +187,11 @@ When evaluating the output, it can be seen that the "hypothesis matrix (transpos
 
 The derived research hypotheses can be rewritten as:
 
-\begin{align}
-H_{0_1}:&& \mu_2 & = \mu_1 \\
-H_{0_2}:&& \mu_3 & = \mu_2 \\
-H_{0_3}:&& \mu_4 & = \mu_3
-\end{align}
+\begin{align*}
+H_{0_1}:&& \mu_2 & = \mu_1 && \\
+H_{0_2}:&& \mu_3 & = \mu_2 && \\
+H_{0_3}:&& \mu_4 & = \mu_3 &&
+\end{align*}
 
 As expected, the contrasts test each of the successive differences between $\mu_1$, $\mu_2$, $\mu_3$, and $\mu_4$ as outlined above. In a case, where we would be unsure about what a given contrast matrix tests, this hypothesis matrix could thus show us the hypotheses that are tested by the contrast matrix. In order to learn what the intercept term tests in this example case, we can add an intercept to the contrast matrix:
 
@@ -223,9 +225,9 @@ sdifC
 
 In the first column of the transposed hypothesis matrix, we can see that the intercept term -- as is typically the case for centered contrasts -- is the grand mean, i.e. the mean of means:
 
-\begin{align}
-H_{0_{Int}}:&& 0 & = \frac{\mu_1+\mu_2+\mu_3+\mu_4}{4}
-\end{align}
+\begin{align*}
+H_{0_{Int}}:&& 0 & = \frac{\mu_1+\mu_2+\mu_3+\mu_4}{4} &&
+\end{align*}
 
 # Acknowledgements
 
