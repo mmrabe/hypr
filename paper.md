@@ -41,7 +41,7 @@ affiliations:
 
 # Summary
 
-The `hypr` package in R provides the researcher with a straightforward interface to generate contrast matrices from research hypotheses and the reverse. It can be used to derive contrast matrices for custom research hypotheses and as an instructional tool to understand what research hypotheses a given contrast matrix tests.
+The `hypr` package in R provides the researcher with a straightforward interface to generate contrast matrices from research hypotheses and the reverse. It can be used to derive contrast matrices for custom research hypotheses and as an instructional tool to understand what research hypotheses a given contrast matrix tests. We previously reviewed the statistical methodolgy in a tutorial on contrast coding based on the generalized matrix inverse [@Schad2020].
 
 # Contrast coding in R
 
@@ -72,7 +72,7 @@ When fitting a linear model, R will transform the factor to as many contrasts as
 
 # Contrast coding with hypr
 
-While for simpler contrast coding schemes, contrast matrices may be easily interpretable, when custom research hypotheses are tested, contrast coding schemes can be more challenging to understand and to correctly specify. The `hypr` package in R provides a set of functions to aid in this process. It allows translating an arbitrary set of research hypotheses into a contrast matrix, and in reverse allows translating arbitrary contrast matrices into the hypotheses that they test. We reviewed this statistical methodolgy in a tutorial on contrast coding based on the generalized matrix inverse [@Schad2020].
+For simple contrast coding schemes, contrast matrices are easy to interpret. However, when custom contrast coding schemes are defined to test particular research hypotheses, contrast matrices become harder to interpret. The `hypr` package in R provides a set of functions to aid in the process of custom contrast specification. The package provides two functionalities: First, it allows the user to translate research hypotheses to the corresponding contrast matrices. Second, given a contrast matrix, the package translates it to the corresponding hypothesis tests.
 
 Most importantly, the package provides the `hypr()` function which constructs a `hypr` object. An arbitrary set of linear research (null) hypotheses can be passed as arguments. For example, to create a `hypr` object that tests a baseline condition against zero and two treatment conditions against the baseline (i.e., a treatment contrast with one baseline and two treatments), can be created as follows:
 
@@ -132,13 +132,13 @@ This matrix can be assigned to a factor in the same way as the matrices generate
 contrasts(some_factor) <- contr.hypothesis(trtC)
 ```
 
-The package provides more useful functions to retrieve and modify a `hypr` object's contrast matrix or (transposed) hypothesis matrix, such as `cmat()`, `thmat()` and `hmat()` for example.
+The package provides more useful functions to retrieve and modify a `hypr` object's contrast matrix or (transposed) hypothesis matrix, such as `cmat()`, `thmat()`, and `hmat()`
 
 # Contrast validation with hypr
 
-As previously mentioned, `hypr` can also be used to derive a set of tested research (null) hypotheses from a given contrast matrix. This can facilitate verifying what a given contrast matrix is testing. To do so, one can create an empty `hypr` object and set its contrast matrix to whatever matrix is to be inspected.
+As previously mentioned, `hypr` can also be used to derive a set of tested research (null) hypotheses from a given contrast matrix. This may help to verify what a given contrast matrix is testing. To do so, one can create an empty `hypr` object and set its contrast matrix to whatever matrix is to be inspected.
 
-We here consider a successive difference contrast, which is designed to test the differences between each successive pair of ordered groups [@Venables2002]. For example, with four levels, the contrast should test three hypotheses: the difference between the second and the first factor level, between the third and second factor level, as well as between the fourth and third level. This is not intuitive by looking at the contrast matrix alone:
+We here consider a successive difference contrast, which is designed to test the differences between each successive pair of ordered groups [@Venables2002]. For example, with four levels, the contrast should test three hypotheses: the difference between the second and the first factor level, between the third and second factor level, as well as between the fourth and third level. This is not immediately clear from looking at the contrast matrix alone:
 
 
 ```r
@@ -231,6 +231,6 @@ H_{0_{Int}}:&& 0 & = \frac{\mu_1+\mu_2+\mu_3+\mu_4}{4} &&
 
 # Acknowledgements
 
-The development of this package was supported by German Research Foundation (DFG)/SFB 1287 _Limits of variability in language_ and Center for Interdisciplinary Research, Bielefeld (ZiF)/Cooperation Group _Statistical models for psychological and linguistic data_.
+The development of this package was supported by German Research Foundation (DFG), SFB 1287 _Limits of Variability in Language_, project number 317633480, and Center for Interdisciplinary Research, Bielefeld (ZiF), Cooperation Group _Statistical models for psychological and linguistic data_.
 
 # References
