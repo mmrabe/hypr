@@ -10,8 +10,12 @@
 \alias{cmat2eqs}
 \title{Shorthand versions for simple hypothesis translation}
 \usage{
-eqs2hmat(eqs, levels = NULL, order_levels = missing(levels),
-  as_fractions = TRUE)
+eqs2hmat(
+  eqs,
+  levels = NULL,
+  order_levels = missing(levels),
+  as_fractions = TRUE
+)
 
 eqs2cmat(eqs, as_fractions = TRUE)
 

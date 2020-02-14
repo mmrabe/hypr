@@ -393,36 +393,62 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
 `+.hypr` <- function(e1, e2) {
   check_argument(e1, "hypr")
   check_argument(e2, "hypr")
-  hmat1 <- hmat(e1)
-  hmat2 <- hmat(e2)
-  new_cols <- union(colnames(hmat1), colnames(hmat2))
-  new_rows <- NULL
-  if(!is.null(rownames(hmat1)) && !is.null(rownames(hmat2))) {
-    dups <- intersect(rownames(hmat1), rownames(hmat2))
-    if(length(dups) == 0) {
-      new_rows <- c(rownames(hmat1), rownames(hmat2))
-    } else {
-      warning(sprintf("Contrast names are dropped because of duplicates: %s", paste(dups, collapse=", ")))
-    }
-  } else if(is.null(rownames(hmat1)) != is.null(rownames(hmat2))) {
-    warning("Contrast names are dropped because not all hypr objects contain named hypotheses.")
+  cmat1 <- cmat(e1)
+  cmat2 <- cmat(e2)
+  if(is.null(rownames(cmat1))) {
+    rownames(cmat1) <- sprintf("mu%d", seq_len(nrow(cmat1)))
   }
-  hmat0 <- matrix(0, nrow = nrow(hmat1) + nrow(hmat2), ncol = length(new_cols), dimnames = list(new_rows, new_cols))
-  hmat0[seq_len(nrow(hmat1)),colnames(hmat1)] <- hmat1
-  hmat0[seq_len(nrow(hmat2))+nrow(hmat1),colnames(hmat2)] <- hmat2
-  h0 <- hypr()
-  hmat(h0) <- hmat0
-  h0
+  if(is.null(rownames(cmat2))) {
+    rownames(cmat2) <- sprintf("mu%d", seq_len(nrow(cmat2)))
+  }
+  mat <- do.call(rbind, lapply(seq_len(nrow(cmat1)), function(i) {
+    cbind(cmat1[rep(i, each=nrow(cmat2)), , drop = FALSE], cmat2)
+  }))
+  colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else c(colnames(cmat1), colnames(cmat2))
+  rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
+  ret <- hypr()
+  cmat(ret) <- mat
+  ret
 }
 
-#' Concatenate hypr objects
+`**.hypr` <- function(e1, e2) {
+  ret <- hypr()
+  cmat(ret) <- cbind(cmat(e1+e2), cmat(e1*e2))
+  ret
+}
+
+`*.hypr` <- function(e1, e2) {
+  check_argument(e1, "hypr")
+  check_argument(e2, "hypr")
+  cmat1 <- cmat(e1)
+  cmat2 <- cmat(e2)
+  if(is.null(rownames(cmat1))) {
+    rownames(cmat1) <- sprintf("mu%d", seq_len(nrow(cmat1)))
+  }
+  if(is.null(rownames(cmat2))) {
+    rownames(cmat2) <- sprintf("mu%d", seq_len(nrow(cmat2)))
+  }
+  mat <- do.call(cbind, lapply(seq_len(ncol(cmat1)), function(i) {
+    do.call(rbind, lapply(seq_len(nrow(cmat1)), function(j) {
+      cmat1[j,i] * cmat2
+    }))
+  }))
+  colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else sprintf("%s.%s", rep(colnames(cmat1), each=ncol(cmat2)), rep(colnames(cmat2), ncol(cmat1)))
+  rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
+  ret <- hypr()
+  cmat(ret) <- mat
+  ret
+}
+
+#' Combining hypr objects by addition or interaction
 #'
-#' You can concatenate one or more \code{hypr} objects, i.e. combine their hypothesis to a single \code{hypr} object, by adding them with the \code{+} operator.
+#' You can combine one or more \code{hypr} objects, i.e. combine their hypothesis to a single \code{hypr} object, by adding them with the \code{+} or \code{\*} operators.
 #'
-#' The resulting \code{hypr} object will contain all hypotheses of the constituting \code{hypr} objects but the resulting hypothesis and contrast matrices may differ. The result should be identical to creating a new \code{hypr} object with a list of hypotheses comprising all of the constituting hypr object’s hypotheses.
 #'
 #' @param e1,e2 \code{hypr} objects to concatenate
 #' @return The combined \code{hypr} object
+#'
+#' @rdname combination
 #'
 #' @examples
 #'
@@ -434,9 +460,21 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
 #'
 #' hc
 #'
+#' interaction <- h1 * h2
+#'
+#' interaction_and_main <- h1 ** h2
+#'
 #' @export
 #'
 setMethod("+", c("hypr","hypr"), `+.hypr`)
+
+#' @describeIn combination Interaction of \code{e1} and \code{e2}
+#' @export
+setMethod("*", c("hypr","hypr"), `*.hypr`)
+
+#' @describeIn combination Interaction and main contrasts of \code{e1} and \code{e2}
+#' @export
+setMethod("^", c("hypr","hypr"), `**.hypr`)
 
 #' Retrieve and set hypothesis matrix
 #'

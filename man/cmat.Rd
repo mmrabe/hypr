@@ -6,13 +6,16 @@
 \alias{contr.hypothesis}
 \title{Retrieve or set contrast matrix}
 \usage{
-cmat(x, add_intercept = FALSE, remove_intercept = FALSE,
-  as_fractions = TRUE)
+cmat(x, add_intercept = FALSE, remove_intercept = FALSE, as_fractions = TRUE)
 
 cmat(x, add_intercept = FALSE, remove_intercept = FALSE) <- value
 
-contr.hypothesis(..., add_intercept = FALSE, remove_intercept = NULL,
-  as_fractions = FALSE)
+contr.hypothesis(
+  ...,
+  add_intercept = FALSE,
+  remove_intercept = NULL,
+  as_fractions = FALSE
+)
 }
 \arguments{
 \item{x}{A hypr object}
