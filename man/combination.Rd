@@ -4,6 +4,7 @@
 \alias{+,hypr,hypr-method}
 \alias{*,hypr,hypr-method}
 \alias{^,hypr,hypr-method}
+\alias{/,hypr,hypr-method}
 \title{Combining hypr objects by addition or interaction}
 \usage{
 \S4method{+}{hypr,hypr}(e1, e2)
@@ -11,6 +12,8 @@
 \S4method{*}{hypr,hypr}(e1, e2)
 
 \S4method{^}{hypr,hypr}(e1, e2)
+
+\S4method{/}{hypr,hypr}(e1, e2)
 }
 \arguments{
 \item{e1, e2}{\code{hypr} objects to concatenate}
@@ -26,6 +29,8 @@ You can combine one or more \code{hypr} objects, i.e. combine their hypothesis t
 \item \code{*,hypr,hypr-method}: Interaction of \code{e1} and \code{e2}
 
 \item \code{^,hypr,hypr-method}: Interaction and main contrasts of \code{e1} and \code{e2}
+
+\item \code{/,hypr,hypr-method}: Nesting levels of \code{e2} within \code{e1}
 }}
 
 \examples{

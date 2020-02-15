@@ -411,13 +411,7 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   ret
 }
 
-`**.hypr` <- function(e1, e2) {
-  ret <- hypr()
-  cmat(ret) <- cbind(cmat(e1+e2), cmat(e1*e2))
-  ret
-}
-
-`*.hypr` <- function(e1, e2) {
+`:.hypr` <- function(e1, e2) {
   check_argument(e1, "hypr")
   check_argument(e2, "hypr")
   cmat1 <- cmat(e1)
@@ -437,6 +431,25 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
   ret <- hypr()
   cmat(ret) <- mat
+  ret
+}
+
+`*.hypr` <- function(e1, e2) {
+  ret <- hypr()
+  cmat(ret) <- cbind(cmat(`+.hypr`(e1,e2)), cmat(`:.hypr`(e1,e2)))
+  ret
+}
+
+`/.hypr` <- function(e1, e2) {
+  ret <- hypr()
+  e3 <- hypr()
+  cmat(e3) <- diag(length(levels(e1)))
+  names(e3) <- levels(e1)
+  levels(e3) <- levels(e1)
+  cmat1 <- cmat(e1)
+  cmat2 <- cmat(`:.hypr`(e3,e2))
+  cmat(ret) <- cbind(cmat1[rep(seq_len(nrow(cmat1)), each=length(levels(e2))),], cmat2)
+  levels(ret) <- rownames(cmat2)
   ret
 }
 
@@ -474,7 +487,13 @@ setMethod("*", c("hypr","hypr"), `*.hypr`)
 
 #' @describeIn combination Interaction and main contrasts of \code{e1} and \code{e2}
 #' @export
-setMethod("^", c("hypr","hypr"), `**.hypr`)
+setMethod("^", c("hypr","hypr"), `:.hypr`)
+
+#' @describeIn combination Nesting levels of \code{e2} within \code{e1}
+#' @export
+setMethod("/", c("hypr","hypr"), `/.hypr`)
+
+setMethod("seq", c("hypr"), `:.hypr`)
 
 #' Retrieve and set hypothesis matrix
 #'
