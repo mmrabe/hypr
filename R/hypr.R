@@ -473,9 +473,9 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
 #'
 #' hc
 #'
-#' interaction <- h1 * h2
+#' interaction <- h1 & h2
 #'
-#' interaction_and_main <- h1 ** h2
+#' interaction_and_main <- h1 * h2
 #'
 #' @export
 #'
@@ -487,7 +487,7 @@ setMethod("*", c("hypr","hypr"), `*.hypr`)
 
 #' @describeIn combination Interaction and main contrasts of \code{e1} and \code{e2}
 #' @export
-setMethod("^", c("hypr","hypr"), `:.hypr`)
+setMethod("&", c("hypr","hypr"), `:.hypr`)
 
 #' @describeIn combination Nesting levels of \code{e2} within \code{e1}
 #' @export
