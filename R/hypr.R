@@ -347,13 +347,17 @@ is.formula <- function(x) is(x, "formula") || is.call(x) && x[[1]] == "~"
 #'
 #' # Generate a dataset
 #' set.seed(123)
-#' M <- c(X1 = 10, X2 = 20, X3 = 10, X4 = 40) # condition means
+#' M <- c(mu1 = 10, mu2 = 20, mu3 = 10, mu4 = 40) # condition means
 #' N <- 5 # number of observations per condition
 #' SD <- 10 # residual SD
 #' simdat <- do.call(rbind, lapply(names(M), function(x) {
 #'   data.frame(X = x, DV = as.numeric(MASS::mvrnorm(N, unname(M[x]), SD^2, empirical = TRUE)))
 #' }))
+#' simdat$X <- factor(simdat$X, levels=levels(h))
 #' simdat
+#'
+#' # Check agreement of hypothesis levels and factor levels
+#' stopifnot(levels(h) == levels(simdat$X))
 #'
 #' # Linear regression
 #' contrasts(simdat$X) <- contr.hypothesis(h)
