@@ -3,3 +3,4 @@
 ^\.
 ^README.Rmd$
 ^paper\.(bib|html|md|Rmd)$
+^LICENSE$
