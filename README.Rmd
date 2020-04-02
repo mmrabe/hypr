@@ -95,3 +95,6 @@ The derived hypotheses can be rewritten as:
 For more information, see `vignette("hypr-contrasts")`.
 
 
+## Community guidelines
+
+If you want to report a bug, are having technical difficulties or want to recommend features, it’s best to open a [Github Issue](https://github.com/mmrabe/hypr/issues/new/choose). If you want to suggest a specific implementation of a feature or bug fix, you’re welcome to fork the repository and submit a pull request! Alternatively, if you are having problems or questions, you can also send an e-mail (<maximilian.rabe@uni-potsdam.de>).
