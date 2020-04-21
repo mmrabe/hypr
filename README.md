@@ -1,5 +1,5 @@
 
-# hypr
+# hypr [![status](https://joss.theoj.org/papers/866129b28b619712fa28bbc10bef37c6/status.svg)](https://joss.theoj.org/papers/866129b28b619712fa28bbc10bef37c6)
 
 hypr is an R package for easy translation between experimental (null) hypotheses and contrast matrices as used for linear regression. For an extensive overview of the package functions, see the `hypr-intro` vignette, e.g. by running `vignette("hypr-intro")` after installing the package.
 
