@@ -20,7 +20,7 @@ c(
     bibtype = "Article",
     title = "hypr: An R package for hypothesis-driven contrast coding",
     year = 2020,
-    journal = "The Journal of Open Source Software"
+    journal = "The Journal of Open Source Software",
     doi = "10.21105/joss.02134",
     author = c(
       person(given = "Maximilian M.", family = "Rabe"),
