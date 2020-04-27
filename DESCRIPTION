@@ -10,7 +10,7 @@ Authors@R: c(
     person(given = "Sven", family = "Hohenstein", role = c("aut")),
     person(given = "Reinhold", family = "Kliegl", email = "kliegl@uni-potsdam.de", role = c("aut")),
     person(given = "Daniel J.", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut")))
-Description: Translation between experimental null hypotheses, hypothesis matrices, and contrast matrices as used in linear regression models. The package is based on the method described in Schad, Vasishth, Hohenstein, and Kliegl (2019) <doi:10.1016/j.jml.2019.104038>.
+Description: Translation between experimental null hypotheses, hypothesis matrices, and contrast matrices as used in linear regression models. The package is based on the method described in Schad, Vasishth, Hohenstein, and Kliegl (2019) <doi:10.1016/j.jml.2019.104038> and Rabe, Vasishth, Hohenstein, Kliegl, and Schad (2020) <doi:10.21105/joss.02134>.
 License: GPL-3
 Depends: R (>= 3.5.0)
 Imports:
