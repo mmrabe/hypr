@@ -123,7 +123,7 @@ show.hypr <- function(object) {
     cat("\nHypothesis matrix (transposed):\n")
     show(thmat(object))
     cat("\nContrast matrix:\n")
-    show(cmat(object))
+    show(cmat(object, remove_intercept = FALSE, add_intercept = FALSE))
   }
 }
 
@@ -656,10 +656,10 @@ setMethod("formula<-", signature(x="hypr"), `formula<-.hypr`)
 
 
 prepare_cmat <- function(value, add_intercept, remove_intercept) {
-  intercept_col <- which(apply(value, 2, function(col) all(col[-1] == col[1])))
-  if(add_intercept && remove_intercept) {
+  intercept_col <- which_intercept(value)
+  if(isTRUE(add_intercept) && isTRUE(remove_intercept)) {
     stop("Cannot add and remove intercept at the same time!")
-  } else if(add_intercept) {
+  } else if(isTRUE(add_intercept) || (is.null(add_intercept) && length(intercept_col) == 0)) {
     if(length(intercept_col) > 0) {
       warning(sprintf("You are using add_intercept=TRUE but it seems your contrast matrix already includes an intercept at contrast #%d!", intercept_col))
     }
@@ -686,6 +686,10 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
   }
   value
 }
+
+which_intercept <- function(mat) which(apply(mat, 2, function(x) all(x[1]==x[-1])))
+
+has_intercept <- function(mat) length(which_intercept(mat) > 0)
 
 #' Retrieve or set contrast matrix
 #'
@@ -726,9 +730,12 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
 #' @export
 cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fractions = TRUE) {
   check_argument(x, "hypr")
-  check_argument(add_intercept, "logical", 1)
+  check_argument(add_intercept, c("NULL","logical"), 1)
   check_argument(remove_intercept, c("NULL","logical"), 1)
   check_argument(as_fractions, "logical", 1)
+  if(has_intercept(x@cmat) && missing(remove_intercept)) {
+    warning("The contrast matrix you are retrieving appears to have an intercept column. If this is intentional, you can ignore this warning or suppress it by explictly calling cmat(..., remove_intercept=FALSE).")
+  }
   value <- prepare_cmat(x@cmat, add_intercept, remove_intercept)
   if(isTRUE(as_fractions)) {
     MASS::as.fractions(value)
@@ -741,11 +748,14 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
 #' @export
 `cmat<-` <- function(x, add_intercept = FALSE, remove_intercept = FALSE, value) {
   check_argument(x, "hypr")
-  check_argument(add_intercept, "logical", 1)
+  check_argument(add_intercept, c("NULL","logical"), 1)
   check_argument(remove_intercept, c("NULL","logical"), 1)
   check_argument(value, "matrix", "numeric")
   if(!check_names(colnames(value))) {
     rownames(value) <- make.names(rownames(value))
+  }
+  if(!has_intercept(value) && missing(add_intercept)) {
+    warning("The contrast matrix you are assigning to this hypr object does not appear to have an intercept column. If this is intentional, you can ignore this warning or suppress it by explictly calling cmat(..., add_intercept=FALSE) <- x.")
   }
   value <- prepare_cmat(value, add_intercept, remove_intercept)
   if(is.null(rownames(value))) {
@@ -761,7 +771,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
 }
 
 
-#' @describeIn cmat Retrieve contrast matrix to override factor contrasts
+#' @describeIn cmat Retrieve contrast matrix with sensible intercept default to override factor contrasts
 #' @export
 contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL, as_fractions = FALSE) {
   args <- list(...)
@@ -774,6 +784,19 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
     remove_intercept = remove_intercept,
     as_fractions = as_fractions
   )
+}
+
+#' @describeIn cmat Update contrast matrix with sensible intercept default
+#' @export
+`contr.hypothesis<-` <- function(x, add_intercept = NULL, remove_intercept = FALSE, as_fractions = FALSE, value) {
+  check_argument(x, "hypr")
+  check_argument(value, "matrix", "numeric")
+  cmat(
+    x,
+    add_intercept = add_intercept,
+    remove_intercept = remove_intercept
+  ) <- value
+  x
 }
 
 #' Enhanced generalized inverse function

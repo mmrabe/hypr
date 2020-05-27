@@ -4,6 +4,7 @@
 \alias{cmat}
 \alias{cmat<-}
 \alias{contr.hypothesis}
+\alias{contr.hypothesis<-}
 \title{Retrieve or set contrast matrix}
 \usage{
 cmat(x, add_intercept = FALSE, remove_intercept = FALSE, as_fractions = TRUE)
@@ -16,6 +17,13 @@ contr.hypothesis(
   remove_intercept = NULL,
   as_fractions = FALSE
 )
+
+contr.hypothesis(
+  x,
+  add_intercept = NULL,
+  remove_intercept = FALSE,
+  as_fractions = FALSE
+) <- value
 }
 \arguments{
 \item{x}{A hypr object}
@@ -43,7 +51,9 @@ Basic specification of contrasts in R is accomplished with basic R functions \co
 \itemize{
 \item \code{cmat<-}: Set contrast matrix
 
-\item \code{contr.hypothesis}: Retrieve contrast matrix to override factor contrasts
+\item \code{contr.hypothesis}: Retrieve contrast matrix with sensible intercept default to override factor contrasts
+
+\item \code{contr.hypothesis<-}: Update contrast matrix with sensible intercept default
 }}
 
 \examples{
