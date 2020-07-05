@@ -5,11 +5,11 @@ URL: https://maxrabe.com/hypr
 BugReports: https://github.com/mmrabe/hypr/issues
 Version: 0.1.8
 Authors@R: c(
-    person(given = "Maximilian M.", family = "Rabe", email = "maximilian.rabe@uni-potsdam.de", role = c("aut","cre")),
-    person(given = "Shravan", family = "Vasishth", role = c("aut")),
-    person(given = "Sven", family = "Hohenstein", role = c("aut")),
-    person(given = "Reinhold", family = "Kliegl", email = "kliegl@uni-potsdam.de", role = c("aut")),
-    person(given = "Daniel J.", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut")))
+    person(given = "Maximilian M.", family = "Rabe", email = "maximilian.rabe@uni-potsdam.de", role = c("aut","cre"), comment = c(ORCID = "0000-0002-2556-5644")),
+    person(given = "Shravan", family = "Vasishth", role = c("aut"), comment = c(ORCID = "0000-0003-2027-1994")),
+    person(given = "Sven", family = "Hohenstein", role = c("aut"), comment = c(ORCID = "0000-0002-9708-1593")),
+    person(given = "Reinhold", family = "Kliegl", email = "kliegl@uni-potsdam.de", role = c("aut"), comment = c(ORCID = "0000-0002-0180-8488")),
+    person(given = "Daniel J.", family = "Schad", email = "schad@uni-potsdam.de", role = c("aut"), comment = c(ORCID = "0000-0003-2586-6823")))
 Description: Translation between experimental null hypotheses, hypothesis matrices, and contrast matrices as used in linear regression models. The package is based on the method described in Schad, Vasishth, Hohenstein, and Kliegl (2019) <doi:10.1016/j.jml.2019.104038> and Rabe, Vasishth, Hohenstein, Kliegl, and Schad (2020) <doi:10.21105/joss.02134>.
 License: GPL-3
 Depends: R (>= 3.5.0)
