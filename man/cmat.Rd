@@ -4,6 +4,8 @@
 \alias{cmat}
 \alias{cmat<-}
 \alias{contr.hypothesis}
+\alias{contrasts<-,ANY,ANY,hypr-method}
+\alias{contrasts<-,ANY,ANY,hypr_cmat-method}
 \alias{contr.hypothesis<-}
 \title{Retrieve or set contrast matrix}
 \usage{
@@ -17,6 +19,10 @@ contr.hypothesis(
   remove_intercept = NULL,
   as_fractions = FALSE
 )
+
+\S4method{contrasts}{ANY,ANY,hypr}(x, how.many) <- value
+
+\S4method{contrasts}{ANY,ANY,hypr_cmat}(x, how.many) <- value
 
 contr.hypothesis(
   x,
@@ -52,6 +58,10 @@ Basic specification of contrasts in R is accomplished with basic R functions \co
 \item \code{cmat<-}: Set contrast matrix
 
 \item \code{contr.hypothesis}: Retrieve contrast matrix with sensible intercept default to override factor contrasts
+
+\item \code{contrasts<-,ANY,ANY,hypr-method}: Update factor contrasts
+
+\item \code{contrasts<-,ANY,ANY,hypr_cmat-method}: Update factor contrasts
 
 \item \code{contr.hypothesis<-}: Update contrast matrix with sensible intercept default
 }}
