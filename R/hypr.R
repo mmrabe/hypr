@@ -740,7 +740,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
   if(isTRUE(as_fractions)) {
     value <- MASS::as.fractions(value)
   }
-  class(value) <- c(class(value), "hypr_cmat")
+  class(value) <- union(class(value), "hypr_cmat")
   value
 }
 
@@ -804,6 +804,7 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
 }
 
 #' @describeIn cmat Update factor contrasts
+#' @param how.many see \code{\link[stats:contrasts]{stats::contrasts()}}
 #' @export
 setMethod("contrasts<-", c(x="ANY",how.many="ANY",value="hypr"), `contrasts<-.hypr`)
 
@@ -844,7 +845,7 @@ setMethod("contrasts<-", c(x="ANY",how.many="ANY",value="hypr_cmat"), `contrasts
 #' cmat(h)
 #'
 #' # cmat is effectively the generalized inverse of hmat
-#' stopifnot(all.equal(ginv2(hmat(h)), cmat(h)))
+#' stopifnot(all.equal(ginv2(hmat(h)), cmat(h), check.attributes = FALSE))
 #'
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {

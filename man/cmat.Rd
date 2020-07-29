@@ -43,6 +43,8 @@ contr.hypothesis(
 \item{value}{contrast matrix}
 
 \item{...}{A list of hypothesis equations for which to retrieve a contrast matrix}
+
+\item{how.many}{see \code{\link[stats:contrasts]{stats::contrasts()}}}
 }
 \value{
 A \code{matrix} of contrast codes with contrasts as columns and levels as rows.
