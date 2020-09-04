@@ -740,7 +740,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
   if(isTRUE(as_fractions)) {
     value <- MASS::as.fractions(value)
   }
-  class(value) <- union(class(value), "hypr_cmat")
+  class(value) <- c("hypr_cmat", setdiff(class(value), "hypr_cmat"))
   value
 }
 
@@ -763,7 +763,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
   } else {
     rownames(value) <- vapply(rownames(value), function(s) if(grepl("^[^A-Za-z_]", s)) paste0("mu",s) else s, character(1), USE.NAMES = FALSE)
   }
-  class(value) <- setdiff(class(value), "fractions")
+  class(value) <- setdiff(class(value), c("fractions", "hypr_cmat"))
   x@cmat <- value
   x@hmat <- cmat2hmat(value, as_fractions = FALSE)
   x@eqs <- hmat2expr(x@hmat)
@@ -792,8 +792,8 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
   } else if(inherits(value, "hypr_cmat")) {
     cm <- value
   }
-  if(!setequal(levels(x), rownames(cm))) {
-    warning(sprintf("The levels of the hypr object (%s) do not match the levels of the factor (%s). Contrasts may have been incorrectly assigned. Please check results with contrasts(factor) or ensure that level names match!",paste(rownames(cm), collapse = ", "),paste(levels(x), collapse=", ")))
+  if(!isTRUE(all.equal(levels(x), rownames(cm)))) {
+    warning(sprintf("The levels of the hypr object (%s) do not match the levels of the factor (%s). Please check the resulting contrast matrix for errors with contrasts(factor). To avoid errors and this warning, ensure that the order of factor levels and levels in hypr match, e.g. by creating your hypr object with hypr(..., levels = levels(factor)).",paste(rownames(cm), collapse = ", "),paste(levels(x), collapse=", ")))
   }
   cm <- cm[match(levels(x), rownames(cm)), , drop = FALSE]
   if(missing(how.many))
@@ -845,7 +845,9 @@ setMethod("contrasts<-", c(x="ANY",how.many="ANY",value="hypr_cmat"), `contrasts
 #' cmat(h)
 #'
 #' # cmat is effectively the generalized inverse of hmat
-#' stopifnot(all.equal(ginv2(hmat(h)), cmat(h), check.attributes = FALSE))
+#' stopifnot(all.equal(
+#' `class<-`(ginv2(hmat(h)), "matrix"),
+#' `class<-`(cmat(h), "matrix"), check.attributes = FALSE))
 #'
 #' @export
 ginv2 <- function(x, as_fractions = TRUE) {

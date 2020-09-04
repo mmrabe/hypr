@@ -29,7 +29,9 @@ ginv2(hmat(h))
 cmat(h)
 
 # cmat is effectively the generalized inverse of hmat
-stopifnot(all.equal(ginv2(hmat(h)), cmat(h), check.attributes = FALSE))
+stopifnot(all.equal(
+`class<-`(ginv2(hmat(h)), "matrix"),
+`class<-`(cmat(h), "matrix"), check.attributes = FALSE))
 
 }
 \seealso{
