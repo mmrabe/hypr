@@ -2,9 +2,9 @@
 # hypr
 
 
-[![CRAN](http://www.r-pkg.org/badges/version/hypr)](https://cran.r-project.org/package=hypr)
-[![downloads](http://cranlogs.r-pkg.org/badges/hypr)](https://cran.r-project.org/package=hypr)
-[![status](https://joss.theoj.org/papers/866129b28b619712fa28bbc10bef37c6/status.svg)](https://joss.theoj.org/papers/866129b28b619712fa28bbc10bef37c6)
+[![CRAN](https://www.r-pkg.org/badges/version/hypr)](https://cran.r-project.org/package=hypr)
+[![downloads](https://cranlogs.r-pkg.org/badges/hypr)](https://cran.r-project.org/package=hypr)
+[![status](https://joss.theoj.org/papers/10.21105/joss.02134/status.svg)](https://joss.theoj.org/papers/10.21105/joss.02134)
 [![DOI](https://zenodo.org/badge/208564895.svg)](https://zenodo.org/badge/latestdoi/208564895)
 
 
