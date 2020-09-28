@@ -795,7 +795,7 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
   if(!isTRUE(all.equal(levels(x), rownames(cm)))) {
     warning(sprintf("The levels of the hypr object (%s) do not match the levels of the factor (%s). Please check the resulting contrast matrix for errors with contrasts(factor). To avoid errors and this warning, ensure that the order of factor levels and levels in hypr match, e.g. by creating your hypr object with hypr(..., levels = levels(factor)).",paste(rownames(cm), collapse = ", "),paste(levels(x), collapse=", ")))
   }
-  cm <- cm[match(levels(x), rownames(cm)), , drop = FALSE]
+  ## match? cm <- cm[match(levels(x), rownames(cm)), , drop = FALSE]
   if(missing(how.many))
     contrasts(x) <- cm
   else
