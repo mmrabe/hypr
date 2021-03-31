@@ -411,7 +411,7 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else c(colnames(cmat1), colnames(cmat2))
   rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
   ret <- hypr()
-  cmat(ret) <- mat
+  cmat(ret, add_intercept = FALSE) <- mat
   ret
 }
 
@@ -434,25 +434,25 @@ hypr <- function(..., levels = NULL, order_levels = missing(levels)) {
   colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else sprintf("%s.%s", rep(colnames(cmat1), each=ncol(cmat2)), rep(colnames(cmat2), ncol(cmat1)))
   rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
   ret <- hypr()
-  cmat(ret) <- mat
+  cmat(ret, add_intercept = FALSE) <- mat
   ret
 }
 
 `*.hypr` <- function(e1, e2) {
   ret <- hypr()
-  cmat(ret) <- cbind(cmat(`+.hypr`(e1,e2)), cmat(`:.hypr`(e1,e2)))
+  cmat(ret, add_intercept = FALSE) <- cbind(cmat(`+.hypr`(e1,e2)), cmat(`:.hypr`(e1,e2)))
   ret
 }
 
 `/.hypr` <- function(e1, e2) {
   ret <- hypr()
   e3 <- hypr()
-  cmat(e3) <- diag(length(levels(e1)))
+  cmat(e3, add_intercept = FALSE) <- diag(length(levels(e1)))
   names(e3) <- levels(e1)
   levels(e3) <- levels(e1)
   cmat1 <- cmat(e1)
   cmat2 <- cmat(`:.hypr`(e3,e2))
-  cmat(ret) <- cbind(cmat1[rep(seq_len(nrow(cmat1)), each=length(levels(e2))),], cmat2)
+  cmat(ret, add_intercept = FALSE) <- cbind(cmat1[rep(seq_len(nrow(cmat1)), each=length(levels(e2))),], cmat2)
   levels(ret) <- rownames(cmat2)
   ret
 }
