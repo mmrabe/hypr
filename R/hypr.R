@@ -797,7 +797,7 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
   }
   ## match? cm <- cm[match(levels(x), rownames(cm)), , drop = FALSE]
   if(missing(how.many))
-    stats::contrasts(x) <- cm
+    stats::contrasts(x, how.many = ncol(cm)) <- cm
   else
     stats::contrasts(x, how.many) <- cm
   x
