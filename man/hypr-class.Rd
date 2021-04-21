@@ -5,6 +5,7 @@
 \alias{hypr-class}
 \alias{show,hypr-method}
 \alias{levels,hypr-method}
+\alias{nlevels,hypr-method}
 \alias{names,hypr-method}
 \alias{names<-,hypr-method}
 \alias{levels<-,hypr-method}
@@ -15,6 +16,8 @@
 \S4method{show}{hypr}(object)
 
 \S4method{levels}{hypr}(x)
+
+\S4method{nlevels}{hypr}(x)
 
 \S4method{names}{hypr}(x)
 
@@ -36,6 +39,8 @@
 \value{
 A character vector of level names
 
+An integer denoting the number of levels
+
 A character vector of contrast names
 
 A \code{list} of null hypothesis equations
@@ -51,6 +56,8 @@ To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
 \item \code{show}: Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
 
 \item \code{levels}: Retrieve the levels (variable names) used in a \code{hypr} object
+
+\item \code{nlevels}: Retrieve the number of levels (variable names) used in a \code{hypr} object
 
 \item \code{names}: Retrieve the contrast names used in a \code{hypr} object
 
