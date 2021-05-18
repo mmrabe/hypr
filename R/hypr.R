@@ -252,10 +252,23 @@ expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fr
   }, double(length(levels))))
   rownames(ret) <- levels
   colnames(ret) <- names(expr)
-  if(as_fractions)
-    MASS::as.fractions(t(ret))
-  else
-    t(ret)
+  qrM <- qr(ret)
+  ret <- t(ret)
+  if(qrM$rank < nrow(ret)) {
+    keep.hyps <- qrM$pivot[seq_len(qrM$rank)]
+    drop.hyps <- setdiff(seq_len(nrow(ret)), keep.hyps)
+    ret <- ret[keep.hyps,,drop=FALSE]
+    attr(ret, "dropped.hyps") <- drop.hyps
+    if(is.null(names(expr))) {
+      warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped column(s) %s.", paste0("#", drop.hyps, collapse=", ")))
+    } else {
+      dropped.hyps.names <- names(expr)[drop.hyps]
+      attr(ret, "dropped.hyps.names") <- dropped.hyps.names
+      warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped %s.", paste(dropped.hyps.names, collapse=", ")))
+    }
+  }
+  if(as_fractions) ret <- MASS::as.fractions(ret)
+  ret
 }
 
 #' @describeIn conversions Convert null hypothesis equations to contrast matrix
@@ -265,10 +278,10 @@ eqs2cmat <- function(eqs, as_fractions = TRUE) hmat2cmat(eqs2hmat(eqs), as_fract
 #' @describeIn conversions Convert hypothesis matrix to contrast matrix
 #' @export
 hmat2cmat <- function(hmat, as_fractions = TRUE) {
-  if(nrow(hmat) > 0 && ncol(hmat) > 0)
-    ginv2(hmat, as_fractions = as_fractions)
+  if(nrow(hmat) == 0)
+    matrix(0, ncol(hmat), 0, dimnames = list(colnames(hmat),NULL))
   else
-    matrix(0, ncol = 0, nrow = 0)
+    ginv2(hmat, as_fractions = as_fractions)
 }
 
 #' @describeIn conversions Convert contrast matrix to hypothesis matrix
