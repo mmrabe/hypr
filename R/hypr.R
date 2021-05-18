@@ -105,29 +105,59 @@ check_argument <- function(val, ...) {
 setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 
 show.hypr <- function(object) {
+  cat_formatted <- function(txt, bold = FALSE, color = NULL) {
+    if(bold) cat("\033[1m")
+    if(!is.null(color)) cat(sprintf("\033[%dm", c("red" = 31, "green" = 32, "yellow"= 33, "blue" = 34, "gray" = 37, "dark_gray" = 38)[color]))
+    cat(txt)
+    if(!is.null(color)) cat("\033[39m")
+    if(bold) cat("\033[0m")
+  }
   check_argument(object, "hypr")
   hypr_call <- as.call(c(list(as.name("hypr")), formula(object), list(levels = levels(object))))
   if(length(object@eqs) == 0) {
     cat("This hypr object does not contain hypotheses.")
   } else {
     if(length(object@eqs) == 1) {
-      cat("hypr object containing one (1) null hypothesis:")
+      cat_formatted("hypr object containing one (1) null hypothesis:", bold = TRUE)
     } else {
-      cat(sprintf("hypr object containing %d null hypotheses:", length(object@eqs)))
+      cat_formatted(sprintf("hypr object containing %d null hypotheses:", length(object@eqs)), bold = TRUE)
     }
     cat("\n")
     eq.names <- sprintf("H0.%s", if(is.null(names(object@eqs))) seq_along(object@eqs) else names(object@eqs))
+    dropped.hyps <- attr(object@hmat, "dropped.hyps")
+    eqs.str <- vapply(object@eqs, as.character.expr_sum, "")
+    longest.eqs.str <- max(nchar(eqs.str))
+    longest.eqs.name <- max(nchar(eq.names))
     for(i in seq_along(object@eqs)) {
-      cat(sprintf("%*s: 0 = ", max(nchar(eq.names)), eq.names[i]))
-      show.expr_sum(object@eqs[[i]])
+      if(i %in% dropped.hyps) cat("( ")
+      else if(!is.null(dropped.hyps)) cat("  ")
+      cat(sprintf("%*s: 0 = ", longest.eqs.name, eq.names[i]))
+      cat(eqs.str[i])
+      if(i %in% dropped.hyps) {
+        cat(strrep(" ", longest.eqs.str-nchar(eqs.str[i])))
+        cat(" )")
+      }
       cat("\n")
     }
-    cat("\nCall:\n")
+    if(!is.null(attr(object@hmat, "dropped.hyps"))) {
+      cat_formatted("Note: Hypotheses in parentheses are not linearly independent and thus dropped from the hypothesis and contrast matrices!\n", color = "red")
+    }
+    cat("\n")
+    cat_formatted("Call:", bold = TRUE)
+    cat("\n")
     show(hypr_call)
-    cat("\nHypothesis matrix (transposed):\n")
-    show(thmat(object))
-    cat("\nContrast matrix:\n")
-    show(cmat(object, remove_intercept = FALSE, add_intercept = FALSE))
+    cat("\n")
+    cat_formatted("Hypothesis matrix (transposed):", bold = TRUE)
+    cat("\n")
+    x <- t(object@hmat)
+    attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))
+    show(x)
+    cat("\n")
+    cat_formatted("Contrast matrix:", bold = TRUE)
+    cat("\n")
+    x <- t(object@cmat)
+    attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))
+    show(x)
   }
 }
 

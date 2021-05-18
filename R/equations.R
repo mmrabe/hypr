@@ -1,28 +1,30 @@
 
 setClass("expr_num")
-show.expr_num <- function(object) if(is(object, "expr_frac")) show.expr_frac(object) else if(is(object, "expr_real")) show.expr_real(object) else show(object)
+as.character.expr_num <- function(object) if(is(object, "expr_frac")) as.character.expr_frac(object) else if(is(object, "expr_real")) as.character.expr_real(object) else as.character(object)
 
 setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 0L, den = 1L), contains = "expr_num")
-show.expr_frac <- function(object) if(object@den!=1L) cat(sprintf("%d/%d", object@num, object@den)) else cat(object@num)
+as.character.expr_frac <- function(object) if(object@den!=1L) sprintf("%d/%d", object@num, object@den) else as.character(object@num)
 #setMethod("show", "expr_frac", show.expr_frac)
 
 setClass("expr_real", slots = c(num = "numeric"), prototype = list(num = 0), contains = "expr_num")
-show.expr_real <- function(object) cat(object@num)
+as.character.expr_real <- function(object) as.character(object@num)
 #setMethod("show", "expr_real", show.expr_real)
 
 setClass("expr_coef", slots = c(num = "expr_num", var = "character"))
-show.expr_coef <- function(object) {
+as.character.expr_coef <- function(object) {
+  ret <- character(0)
   if(as.numeric.expr_num(object@num) != 1 || length(object@var) == 0) {
     if(as.numeric.expr_num(object@num) == -1) {
-      cat("-")
+      ret <- c(ret, "-")
     } else {
-      show.expr_num(object@num)
+      ret <- c(ret, as.character.expr_num(object@num))
       if(length(object@var) > 0) {
-        cat("*")
+        ret <- c(ret, "*")
       }
     }
   }
-  cat(paste(object@var, collapse = "*"))
+  ret <- c(ret, paste(object@var, collapse = "*"))
+  paste(ret, collapse="")
 }
 #setMethod("show", "expr_coef", show.expr_coef)
 as.expression.expr_coef <- function(x, ...) {
@@ -53,23 +55,23 @@ as.expression.expr_coef <- function(x, ...) {
 #setMethod("as.expression", "expr_coef", as.expression.expr_coef)
 
 setClass("expr_sum", contains = "list")
-show.expr_sum <- function(object) {
+as.character.expr_sum <- function(object) {
   if(length(object) > 0) {
+    ret <- character(0)
     for(i in seq_along(object)) {
       if(i>1) {
         if(as.numeric.expr_num(object[[i]]@num) >= 0) {
-          cat(" + ")
-          show.expr_coef(object[[i]])
+          ret <- c(ret, "+", as.character.expr_coef(object[[i]]))
         } else {
-          cat(" - ")
-          show.expr_coef(multiply_expr(object[[i]], new("expr_coef", num = new("expr_frac", num = -1L))))
+          ret <- c(ret, "-", as.character.expr_coef(multiply_expr(object[[i]], new("expr_coef", num = new("expr_frac", num = -1L)))))
         }
       } else {
-        show.expr_coef(object[[i]])
+        ret <- c(ret, as.character.expr_coef(object[[i]]))
       }
     }
+    paste(ret, collapse=" ")
   } else {
-    cat("0")
+    "0"
   }
 }
 #setMethod("show", "expr_sum", show.expr_sum)
