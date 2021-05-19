@@ -155,7 +155,7 @@ show.hypr <- function(object) {
     cat("\n")
     cat_formatted("Contrast matrix:", bold = TRUE)
     cat("\n")
-    x <- t(object@cmat)
+    x <- object@cmat
     attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))
     show(x)
   }
@@ -290,7 +290,11 @@ expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fr
     ret <- ret[keep.hyps,,drop=FALSE]
     attr(ret, "dropped.hyps") <- drop.hyps
     if(is.null(names(expr))) {
-      warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped column(s) %s.", paste0("#", drop.hyps, collapse=", ")))
+      if(length(drop.hyps) == 1) {
+        warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped hypothesis #%d.", drop.hyps))
+      } else {
+        warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped hypotheses %s.", paste0("#", drop.hyps, collapse=", ")))
+      }
     } else {
       dropped.hyps.names <- names(expr)[drop.hyps]
       attr(ret, "dropped.hyps.names") <- dropped.hyps.names
