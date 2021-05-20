@@ -1,6 +1,7 @@
 #' @include equations.R
 #' @importFrom methods as is new show
 #' @importFrom stats cov
+#' @importFrom MASS as.fractions fractions mvrnorm ginv
 NULL
 
 
@@ -151,13 +152,13 @@ show.hypr <- function(object) {
     cat("\n")
     x <- t(object@hmat)
     attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))
-    show(x)
+    show(fractions(x))
     cat("\n")
     cat_formatted("Contrast matrix:", bold = TRUE)
     cat("\n")
     x <- object@cmat
     attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))
-    show(x)
+    show(fractions(x))
   }
 }
 
@@ -301,7 +302,7 @@ expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fr
       warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped %s.", paste(dropped.hyps.names, collapse=", ")))
     }
   }
-  if(as_fractions) ret <- MASS::as.fractions(ret)
+  if(as_fractions) ret <- as.fractions(ret)
   ret
 }
 
@@ -338,7 +339,7 @@ hmat2expr <- function(hmat, as_fractions = TRUE) {
     simplify_expr_sum(
       as(lapply(seq_len(ncol(hmat)), function(i) {
         if(as_fractions) {
-          frac <- strsplit(attr(MASS::as.fractions(hmat[j,i]), "fracs"), "/", TRUE)[[1]]
+          frac <- strsplit(attr(as.fractions(hmat[j,i]), "fracs"), "/", TRUE)[[1]]
           num <- new("expr_frac", num = as.integer(frac[1]), den = if(length(frac)>1) as.integer(frac[2]) else 1L)
         } else {
           num <- new("expr_real", num = hmat[j,i])
@@ -600,7 +601,7 @@ setMethod("seq", c("hypr"), `:.hypr`)
 #' stopifnot(all.equal(cmat(h), cmat(h2)))
 #'
 #' @export
-hmat <- function(x, as_fractions = TRUE) if(as_fractions) MASS::as.fractions(x@hmat) else x@hmat
+hmat <- function(x, as_fractions = TRUE) if(as_fractions) as.fractions(x@hmat) else x@hmat
 
 #' @describeIn hmat Retrieve transposed hypothesis matrix
 #' @export
@@ -813,7 +814,7 @@ cmat <- function(x, add_intercept = FALSE, remove_intercept = FALSE, as_fraction
   }
   value <- prepare_cmat(x@cmat, add_intercept, remove_intercept)
   if(isTRUE(as_fractions)) {
-    value <- MASS::as.fractions(value)
+    value <- as.fractions(value)
   }
   class(value) <- c("hypr_cmat", setdiff(class(value), "hypr_cmat"))
   value
@@ -929,9 +930,9 @@ setMethod("contrasts<-", c(x="ANY",how.many="ANY",value="hypr_cmat"), `contrasts
 ginv2 <- function(x, as_fractions = TRUE) {
   check_argument(x, "matrix", "numeric")
   check_argument(as_fractions, "logical", 1)
-  y <- round(MASS::ginv(x), floor(-log10(.Machine$double.neg.eps) - 3))
+  y <- round(ginv(x), floor(-log10(.Machine$double.neg.eps) - 3))
   dimnames(y) <- dimnames(x)[2:1]
-  if(isTRUE(as_fractions)) MASS::fractions(y) else y
+  if(isTRUE(as_fractions)) fractions(y) else y
 }
 
 
