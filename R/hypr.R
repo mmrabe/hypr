@@ -477,9 +477,22 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
     cbind(cmat1[rep(i, each=nrow(cmat2)), , drop = FALSE], cmat2)
   }))
   colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else c(colnames(cmat1), colnames(cmat2))
-  rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
+  rownames(mat) <- sprintf("%s:%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
+  qrM <- qr(mat)
+  if(qrM$rank < ncol(mat)) {
+    drop.cols <- sort(qrM$pivot[-seq_len(qrM$rank)])
+    warning(sprintf("The resulting contrast matrix is rank-deficient. Dropping %d column(s).", length(drop.cols)))
+    mat <- mat[,qrM$pivot[seq_len(qrM$rank)],drop=FALSE]
+  }
   ret <- hypr()
-  cmat(ret, add_intercept = FALSE) <- mat
+  add_intercept <- FALSE
+  if(has_intercept(e1) || has_intercept(e2)) {
+    qrM <- qr(cbind(1, mat))
+    if(qrM$rank == ncol(mat) + 1) {
+      add_intercept <- TRUE
+    }
+  }
+  cmat(ret, add_intercept = add_intercept) <- mat
   ret
 }
 
@@ -499,29 +512,29 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
       cmat1[j,i] * cmat2
     }))
   }))
-  colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else sprintf("%s.%s", rep(colnames(cmat1), each=ncol(cmat2)), rep(colnames(cmat2), ncol(cmat1)))
-  rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
+  colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else sprintf("%s:%s", rep(colnames(cmat1), each=ncol(cmat2)), rep(colnames(cmat2), ncol(cmat1)))
+  rownames(mat) <- sprintf("%s:%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
   ret <- hypr()
   cmat(ret, add_intercept = has_intercept(e1) || has_intercept(e2)) <- mat
   ret
 }
 
 `*.hypr` <- function(e1, e2) {
-  ret <- hypr()
-  cmat(ret, add_intercept = FALSE) <- cbind(cmat(`+.hypr`(e1,e2)), cmat(`:.hypr`(e1,e2)))
-  ret
+  e1 + e2 + (e1 & e2)
 }
 
 `/.hypr` <- function(e1, e2) {
-  ret <- hypr()
   e3 <- hypr()
   cmat(e3, add_intercept = FALSE) <- diag(length(levels(e1)))
-  names(e3) <- levels(e1)
-  levels(e3) <- levels(e1)
-  cmat1 <- cmat(e1)
-  cmat2 <- cmat(`:.hypr`(e3,e2))
-  cmat(ret, add_intercept = FALSE) <- cbind(cmat1[rep(seq_len(nrow(cmat1)), each=length(levels(e2))),], cmat2)
-  levels(ret) <- rownames(cmat2)
+  names(e3) <- levels(e3) <- levels(e1)
+  #cmat1 <- cmat(e1, remove_intercept = TRUE)
+  #cmat2 <- cmat(`:.hypr`(e3,e2), remove_intercept = FALSE)
+  e4 <- e3 & e2
+  mat <- cmat(e3, remove_intercept = FALSE)
+  mat <- mat[rep(seq_len(nrow(mat)), each=length(levels(e2))),,drop=FALSE]
+  rownames(mat) <- paste0(rep(levels(e3), each=length(levels(e2))),":",levels(e2))
+  ret <- hypr()
+  cmat(ret, add_intercept = FALSE) <- cbind(mat, cmat(e4, remove_intercept = has_intercept(e4)))
   ret
 }
 
