@@ -986,7 +986,9 @@ has_intercept <- function(x) any(is_intercept(x))
 centered_contrasts <- function(x) {
   check_argument(x, "hypr")
   cm <- cmat(x, add_intercept = FALSE, remove_intercept = FALSE)
-  cm <- cm - rep(colMeans(cm), each = nrow(cm))
+  means <- colMeans(cm)
+  means[which_intercept(cm)] <- 0
+  cm <- cm - rep(means, each = nrow(cm))
   cmat(x, add_intercept = FALSE, remove_intercept = FALSE) <- cm
   x
 }
