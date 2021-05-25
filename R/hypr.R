@@ -429,7 +429,7 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
     hyps <- hyps[[1]]
   } else if(length(hyps) == 1 && is.matrix(hyps[[1]])) {
     h <- hypr()
-    cmat(h) <- hyps[[1]]
+    cmat(h, add_intercept = FALSE) <- hyps[[1]]
     return(h)
   }
   if(!all(vapply(hyps, is.formula, logical(1)))) {
@@ -465,8 +465,8 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
 `+.hypr` <- function(e1, e2) {
   check_argument(e1, "hypr")
   check_argument(e2, "hypr")
-  cmat1 <- cmat(e1)
-  cmat2 <- cmat(e2)
+  cmat1 <- cmat(e1, remove_intercept = has_intercept(e1))
+  cmat2 <- cmat(e2, remove_intercept = has_intercept(e2))
   if(is.null(rownames(cmat1))) {
     rownames(cmat1) <- sprintf("mu%d", seq_len(nrow(cmat1)))
   }
@@ -486,8 +486,8 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
 `:.hypr` <- function(e1, e2) {
   check_argument(e1, "hypr")
   check_argument(e2, "hypr")
-  cmat1 <- cmat(e1)
-  cmat2 <- cmat(e2)
+  cmat1 <- cmat(e1, remove_intercept = has_intercept(e1))
+  cmat2 <- cmat(e2, remove_intercept = has_intercept(e2))
   if(is.null(rownames(cmat1))) {
     rownames(cmat1) <- sprintf("mu%d", seq_len(nrow(cmat1)))
   }
@@ -502,7 +502,7 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
   colnames(mat) <- if(is.null(colnames(cmat1)) || is.null(colnames(cmat2))) NULL else sprintf("%s.%s", rep(colnames(cmat1), each=ncol(cmat2)), rep(colnames(cmat2), ncol(cmat1)))
   rownames(mat) <- sprintf("%s.%s", rep(rownames(cmat1), each=nrow(cmat2)), rep(rownames(cmat2), nrow(cmat1)))
   ret <- hypr()
-  cmat(ret, add_intercept = FALSE) <- mat
+  cmat(ret, add_intercept = has_intercept(e1) || has_intercept(e2)) <- mat
   ret
 }
 
