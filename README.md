@@ -32,13 +32,13 @@ Deriving contrast matrices
 
 For a treatment contrast with a baseline and three treatment conditions:
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_1%7D:%20%5C;%20%5Cmu_1%20%3D%200)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_1%7D:%20%5Cmu_1%20=%200)
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_2%7D:%20%5C;%20%5Cmu_2%20%3D%20%5Cmu_1)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_2%7D:%20%5Cmu_2%20=%20%5Cmu_1)
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_3%7D:%20%5C;%20%5Cmu_3%20%3D%20%5Cmu_1)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_3%7D:%20%5Cmu_3%20=%20%5Cmu_1)
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_4%7D:%20%5C;%20%5Cmu_4%20%3D%20%5Cmu_1)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_4%7D:%20%5Cmu_4%20=%20%5Cmu_1)
 
 ``` r
 trtC <- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
@@ -149,13 +149,13 @@ testC
 
 The derived hypotheses can be rewritten as:
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_1%7D:%20%5C;%20%5Cmu_1%20%3D%200)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_1%7D:%20%5Cmu_1%20=%200)
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_2%7D:%20%5C;%20%5Cmu_2%20%3D%20%5Cmu_1)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_2%7D:%20%5Cmu_2%20=%20%5Cmu_1)
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_3%7D:%20%5C;%20%5Cmu_3%20%3D%20%5Cmu_1)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_3%7D:%20%5Cmu_3%20=%20%5Cmu_1)
 
-![](https://latex.codecogs.com/gif.latex?H_%7B0_4%7D:%20%5C;%20%5Cmu_4%20%3D%20%5Cmu_1)
+![](https://render.githubusercontent.com/render/math?math=H_%7B0_4%7D:%20%5Cmu_4%20=%20%5Cmu_1)
 
 For more information, see `vignette("hypr-contrasts")`.
 
