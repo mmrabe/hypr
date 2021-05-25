@@ -3,7 +3,7 @@ Type: Package
 Title: Hypothesis Matrix Translation
 URL: https://maxrabe.com/hypr
 BugReports: https://github.com/mmrabe/hypr/issues
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person(given = "Maximilian M.", family = "Rabe", email = "maximilian.rabe@uni-potsdam.de", role = c("aut","cre"), comment = c(ORCID = "0000-0002-2556-5644")),
     person(given = "Shravan", family = "Vasishth", role = c("aut"), comment = c(ORCID = "0000-0003-2027-1994")),
