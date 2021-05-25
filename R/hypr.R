@@ -2,6 +2,8 @@
 #' @importFrom methods as is new show
 #' @importFrom stats cov
 #' @importFrom MASS as.fractions fractions mvrnorm ginv
+#' @importFrom cli style_bold col_red
+#' @importFrom magrittr %>%
 NULL
 
 
@@ -106,22 +108,15 @@ check_argument <- function(val, ...) {
 setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 
 show.hypr <- function(object) {
-  cat_formatted <- function(txt, bold = FALSE, color = NULL) {
-    if(bold) cat("\033[1m")
-    if(!is.null(color)) cat(sprintf("\033[%dm", c("red" = 31, "green" = 32, "yellow"= 33, "blue" = 34, "gray" = 37, "dark_gray" = 38)[color]))
-    cat(txt)
-    if(!is.null(color)) cat("\033[39m")
-    if(bold) cat("\033[0m")
-  }
   check_argument(object, "hypr")
   hypr_call <- as.call(c(list(as.name("hypr")), formula(object), list(levels = levels(object))))
   if(length(object@eqs) == 0) {
     cat("This hypr object does not contain hypotheses.")
   } else {
     if(length(object@eqs) == 1) {
-      cat_formatted("hypr object containing one (1) null hypothesis:", bold = TRUE)
+      cat("hypr object containing one (1) null hypothesis:" %>% style_bold)
     } else {
-      cat_formatted(sprintf("hypr object containing %d null hypotheses:", length(object@eqs)), bold = TRUE)
+      cat(sprintf("hypr object containing %d null hypotheses:", length(object@eqs)) %>% style_bold)
     }
     cat("\n")
     eq.names <- sprintf("H0.%s", if(is.null(names(object@eqs))) seq_along(object@eqs) else names(object@eqs))
@@ -141,20 +136,21 @@ show.hypr <- function(object) {
       cat("\n")
     }
     if(!is.null(attr(object@hmat, "dropped.hyps"))) {
-      cat_formatted("Note: Hypotheses in parentheses are not linearly independent and thus dropped from the hypothesis and contrast matrices!\n", color = "red")
+      cat("Note: Hypotheses in parentheses are not linearly independent and thus dropped from the hypothesis and contrast matrices!" %>% col_red)
+      cat("\n")
     }
     cat("\n")
-    cat_formatted("Call:", bold = TRUE)
+    cat("Call:" %>% style_bold)
     cat("\n")
     show(hypr_call)
     cat("\n")
-    cat_formatted("Hypothesis matrix (transposed):", bold = TRUE)
+    cat("Hypothesis matrix (transposed):" %>% style_bold)
     cat("\n")
     x <- t(object@hmat)
     attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))
     show(fractions(x))
     cat("\n")
-    cat_formatted("Contrast matrix:", bold = TRUE)
+    cat("Contrast matrix:" %>% style_bold)
     cat("\n")
     x <- object@cmat
     attributes(x) <- list(dim = dim(x), dimnames = dimnames(x))

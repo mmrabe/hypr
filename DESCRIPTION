@@ -16,10 +16,12 @@ Depends: R (>= 3.5.0)
 Imports:
     MASS,
     pracma,
-    methods
+    methods,
+    cli,
+    magrittr,
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.1.1
