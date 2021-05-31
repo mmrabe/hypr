@@ -749,6 +749,24 @@ setMethod("formula", signature(x="hypr"), formula.hypr)
 setMethod("formula<-", signature(x="hypr"), `formula<-.hypr`)
 
 
+#' @describeIn is_intercept Add an intercept column if there is none
+#' @export
+add_intercept <- function(x) {
+  if(!has_intercept(x)) {
+    cmat(x, add_intercept = TRUE, remove_intercept = FALSE) <- x@cmat
+  }
+  x
+}
+
+#' @describeIn is_intercept Remove the intercept column if there is one
+#' @export
+remove_intercept <- function(x) {
+  if(has_intercept(x)) {
+    cmat(x, add_intercept = FALSE, remove_intercept = TRUE) <- x@cmat
+  }
+  x
+}
+
 prepare_cmat <- function(value, add_intercept, remove_intercept) {
   intercept_col <- which_intercept(value)
   if(isTRUE(add_intercept) && isTRUE(remove_intercept)) {
@@ -952,13 +970,13 @@ ginv2 <- function(x, as_fractions = TRUE) {
 
 #' Intercept checks
 #'
-#' Non-centered contrasts require an intercept for correct specification of experimental hypotheses.
+#' Non-centered contrasts require an intercept for correct specification of experimental hypotheses. These functions enable the user to check for existance of intercepts and to add or remove intercept columns as needed.
 #'
-#' There are functions available to check whether a \code{hypr} object contains an intercept (\code{has_intercept}) or which contrast is the intercept (\code{is_intercept}, \code{which_intercept}).
+#' There are functions available to check whether a \code{hypr} object contains an intercept (\code{has_intercept}) or which contrast is the intercept (\code{is_intercept}, \code{which_intercept}). Moreover, if needed, the user can add (\code{add_intercept}) or remove (\code{remove_intercept}) an intercept column to/from a hypr object. \code{add_intercept} and \code{remove_intercept} do not throw an error if the user attempts to remove a non-existing intercept or add an intercept if there already is one.
 #'
 #' @param x A hypr object
 #' @rdname is_intercept
-#' @return A single logical value (\code{has_intercept}), a logical vector (\code{is_intercept}), or an integer index vector (\code{which_intercept})
+#' @return A single logical value (\code{has_intercept}), a logical vector (\code{is_intercept}), an integer index vector (\code{which_intercept}), or a modified hypr object (\code{add_intercept}, \code{remove_intercept})
 #'
 #' @examples
 #'
