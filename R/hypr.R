@@ -758,6 +758,9 @@ setMethod("formula<-", signature(x="hypr"), `formula<-.hypr`)
 #' @export
 add_intercept <- function(x) {
   if(!has_intercept(x)) {
+    if(nrow(x@cmat) == 0) {
+      stop("Cannot add an intercept to an empty hypr object!")
+    }
     cmat(x, add_intercept = TRUE, remove_intercept = FALSE) <- x@cmat
   }
   x
