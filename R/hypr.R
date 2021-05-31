@@ -516,7 +516,12 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
 }
 
 `*.hypr` <- function(e1, e2) {
-  e1 + e2 + (e1 & e2)
+  main <- e1 + e2
+  inter <- e1 & e2
+  cmat_comb <- cbind(cmat(main, remove_intercept = has_intercept(main)), cmat(inter, remove_intercept = has_intercept(inter)))
+  ret <- hypr()
+  cmat(ret, add_intercept = has_intercept(main) || has_intercept(inter)) <- cmat_comb
+  ret
 }
 
 `/.hypr` <- function(e1, e2) {
