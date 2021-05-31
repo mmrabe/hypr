@@ -758,6 +758,7 @@ setMethod("formula<-", signature(x="hypr"), `formula<-.hypr`)
 #' @describeIn is_intercept Add an intercept column if there is none
 #' @export
 add_intercept <- function(x) {
+  check_argument(x, "hypr")
   if(!has_intercept(x)) {
     if(nrow(x@cmat) == 0) {
       stop("Cannot add an intercept to an empty hypr object!")
@@ -770,6 +771,7 @@ add_intercept <- function(x) {
 #' @describeIn is_intercept Remove the intercept column if there is one
 #' @export
 remove_intercept <- function(x) {
+  check_argument(x, "hypr")
   if(has_intercept(x)) {
     cmat(x, add_intercept = FALSE, remove_intercept = TRUE) <- x@cmat
   }
@@ -998,7 +1000,10 @@ ginv2 <- function(x, as_fractions = TRUE) {
 #' stopifnot(is_intercept(h1) == c(TRUE,FALSE))
 #'
 #' @export
-is_intercept <- function(x) apply(if(inherits(x, "hypr")) x@cmat else x, 2, function(y) all(abs(y[1]-y[-1])<=1e-5))
+is_intercept <- function(x) {
+  check_argument(x, "hypr")
+  apply(if(inherits(x, "hypr")) x@cmat else x, 2, function(y) all(abs(y[1]-y[-1])<=1e-5))
+}
 
 #' @describeIn is_intercept Return indices, not a logical vector of intercept columns
 #' @export
@@ -1045,6 +1050,8 @@ is_centered <- function(x) {
 #' @param ignore_intercept If \code{TRUE}, the intercept is ignored
 #' @export
 all_centered <- function(x, ignore_intercept = TRUE) {
+  check_argument(x, "hypr")
+  check_argument(ignore_intercept, "logical", 1)
   cc <- is_centered(x)
   if(isTRUE(ignore_intercept)) {
     all(cc[-which_intercept(x)])
