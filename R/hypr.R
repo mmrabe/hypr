@@ -702,6 +702,7 @@ setMethod("names<-", signature(x="hypr"), `names<-.hypr`)
   check_argument(x, "hypr")
   check_argument(value, c("NULL","character"))
   mat <- hmat(x)
+  if(ncol(mat) != length(value)) stop(sprintf("Trying to assign %d new level names to hypr object with %d factor levels.", length(value), ncol(mat)))
   colnames(mat) <- value
   `hmat<-`(hypr(), mat)
 }
