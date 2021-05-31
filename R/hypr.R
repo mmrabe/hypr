@@ -2,7 +2,7 @@
 #' @importFrom methods as is new show
 #' @importFrom stats cov
 #' @importFrom MASS as.fractions fractions mvrnorm ginv
-#' @importFrom cli style_bold col_red
+#' @importFrom cli style_bold col_red col_grey
 #' @importFrom magrittr %>%
 NULL
 
@@ -121,6 +121,7 @@ show.hypr <- function(object) {
     cat("\n")
     eq.names <- sprintf("H0.%s", if(is.null(names(object@eqs))) seq_along(object@eqs) else names(object@eqs))
     dropped.hyps <- attr(object@hmat, "dropped.hyps")
+    kept.hyps <- setdiff(seq_along(object@eqs), dropped.hyps)
     eqs.str <- vapply(object@eqs, as.character.expr_sum, "")
     longest.eqs.str <- max(nchar(eqs.str))
     longest.eqs.name <- max(nchar(eq.names))
@@ -132,6 +133,10 @@ show.hypr <- function(object) {
       if(i %in% dropped.hyps) {
         cat(strrep(" ", longest.eqs.str-nchar(eqs.str[i])))
         cat(" )")
+      }
+      if(i %in% kept.hyps[which_intercept(object)]) {
+        cat(strrep(" ", longest.eqs.str-nchar(eqs.str[i])))
+        cat(col_grey("  (Intercept)"))
       }
       cat("\n")
     }
