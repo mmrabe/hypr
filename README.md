@@ -46,7 +46,7 @@ trtC
 ```
 
     ## hypr object containing 4 null hypotheses:
-    ## H0.1: 0 = mu1
+    ## H0.1: 0 = mu1        (Intercept)
     ## H0.2: 0 = mu2 - mu1
     ## H0.3: 0 = mu3 - mu1
     ## H0.4: 0 = mu4 - mu1
@@ -124,7 +124,7 @@ testC
 ```
 
     ## hypr object containing 4 null hypotheses:
-    ## H0.Intercept: 0 = X1
+    ## H0.Intercept: 0 = X1        (Intercept)
     ##         H0.2: 0 = -X1 + X2
     ##         H0.3: 0 = -X1 + X3
     ##         H0.4: 0 = -X1 + X4
