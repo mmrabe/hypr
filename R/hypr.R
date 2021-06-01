@@ -1001,7 +1001,7 @@ ginv2 <- function(x, as_fractions = TRUE) {
 #'
 #' @export
 is_intercept <- function(x) {
-  check_argument(x, "hypr")
+  check_argument(x, c("hypr","matrix"))
   apply(if(inherits(x, "hypr")) x@cmat else x, 2, function(y) all(abs(y[1]-y[-1])<=1e-5))
 }
 
