@@ -1,12 +1,16 @@
 
+#' @importFrom MASS fractions
+#' @importFrom pracma gcd Lcm
+
+
 setClass("expr_num")
 as.character.expr_num <- function(object) if(is(object, "expr_frac")) as.character.expr_frac(object) else if(is(object, "expr_real")) as.character.expr_real(object) else as.character(object)
 
-setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 0L, den = 1L), contains = "expr_num")
+setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 1L, den = 1L), contains = "expr_num")
 as.character.expr_frac <- function(object) if(object@den!=1L) sprintf("%d/%d", object@num, object@den) else as.character(object@num)
 #setMethod("show", "expr_frac", show.expr_frac)
 
-setClass("expr_real", slots = c(num = "numeric"), prototype = list(num = 0), contains = "expr_num")
+setClass("expr_real", slots = c(num = "numeric"), prototype = list(num = 1), contains = "expr_num")
 as.character.expr_real <- function(object) as.character(object@num)
 #setMethod("show", "expr_real", show.expr_real)
 
@@ -54,9 +58,32 @@ as.expression.expr_coef <- function(x, ...) {
 }
 #setMethod("as.expression", "expr_coef", as.expression.expr_coef)
 
-setClass("expr_sum", contains = "list")
+setClass("expr_sum", contains = "list", slots = c(num = "expr_num"), prototype = prototype(num = new("expr_frac", num=1L, den=1L)))
 as.character.expr_sum <- function(object) {
   if(length(object) > 0) {
+    # reformat
+    if(length(object) > 1) {
+      div <- gcd(as.numeric.expr_num(object[[1]]@num), as.numeric.expr_num(object[[2]]@num))
+      for(i in seq_along(object)[c(-1,-2)]) {
+        div <- gcd(div, as.numeric.expr_num(object[[i]]@num))
+      }
+      if(div != 1) {
+        if(div %% 1 == 0) {
+          object@num <- new("expr_frac", num = as.integer(div))
+        } else {
+          frac <- as.integer(strsplit(attr(MASS::fractions(div), "fracs"), "/", TRUE)[[1]])
+          if(length(frac) == 2 && frac[2] < 10000) {
+            object@num <- simplify.expr_num(new("expr_frac", num = frac[1], den = frac[2]))
+          } else {
+            object@num <- new("expr_real", num = div)
+          }
+        }
+        for(i in seq_along(object)) {
+          object[[i]]@num <- simplify.expr_num(`/.expr_num`(object[[i]]@num, object@num))
+        }
+      }
+    }
+
     ret <- character(0)
     for(i in seq_along(object)) {
       if(i>1) {
@@ -69,7 +96,12 @@ as.character.expr_sum <- function(object) {
         ret <- c(ret, as.character.expr_coef(object[[i]]))
       }
     }
-    paste(ret, collapse=" ")
+    if(as.numeric.expr_num(object@num) != 1) {
+      if(is(object@num, "expr_frac") && object@num@num == 1) paste0("(", paste(ret, collapse=" "), ")", "/", object@num@den)
+      else if(is(object@num, "expr_frac") && object@num@den == 1) paste0(object@num, "*", "(", paste(ret, collapse=" "), ")")
+      else paste0(as.character.expr_num(object@num), "*", "(", paste(ret, collapse=" "), ")")
+    }
+    else paste(ret, collapse=" ")
   } else {
     "0"
   }
@@ -110,7 +142,7 @@ as.fractions.expr_num <- function(x) {
 
 `*.expr_num` <- function(a, b) {
   if(is(a, "expr_frac") && is(b, "expr_frac")) {
-    new("expr_frac", num = a@num*b@num, den = a@den*b@den)
+    simplify.expr_num(new("expr_frac", num = a@num*b@num, den = a@den*b@den))
   } else {
     new("expr_real", num = as.numeric.expr_num(a)*as.numeric.expr_num(b))
   }
@@ -126,10 +158,10 @@ as.fractions.expr_num <- function(x) {
 `+.expr_num` <- function(a, b) {
   if(is(a, "expr_frac") && is(b, "expr_frac")) {
     if(a@den!=b@den) {
-      lcm <- as.integer(pracma::Lcm(a@den, b@den))
-      new("expr_frac", num = a@num * lcm %/% a@den +  b@num * lcm %/% b@den, den = lcm)
+      lcm <- as.integer(Lcm(a@den, b@den))
+      simplify.expr_num(new("expr_frac", num = a@num * lcm %/% a@den +  b@num * lcm %/% b@den, den = lcm))
     } else {
-      new("expr_frac", num = a@num+b@num, den = a@den)
+      simplify.expr_num(new("expr_frac", num = a@num+b@num, den = a@den))
     }
   } else {
     new("expr_real", num = as.numeric.expr_num(a)+as.numeric.expr_num(b))
@@ -141,6 +173,17 @@ as.fractions.expr_num <- function(x) {
   b <- if(is(b, "expr_frac")) new("expr_frac", num = -b@num, den = b@den) else new("expr_real", num = -as.numeric.expr_num(b@num))
   `+.expr_num`(a, b)
 }
+
+
+simplify.expr_num <- function(a) {
+  if(is(a, "expr_frac")) {
+    div <- as.integer(gcd(a@num, a@den))
+    a@num <- a@num %/% div
+    a@den <- a@den %/% div
+  }
+  a
+}
+
 #setMethod("-", signature("expr_num", "expr_num"), function(e1, e2) `-.expr_num`(e1, e2))
 #setMethod("-", signature("expr_num"), function(e1) new("expr_frac", num=0L, den=1L) - e1)
 
