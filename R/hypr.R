@@ -430,7 +430,7 @@ hypr <- function(..., levels = NULL, add_intercept = FALSE, remove_intercept = F
     hyps <- hyps[[1]]
   } else if(length(hyps) == 1 && is.matrix(hyps[[1]])) {
     h <- hypr()
-    cmat(h, add_intercept = FALSE) <- hyps[[1]]
+    cmat(h, add_intercept = add_intercept, remove_intercept = remove_intercept) <- hyps[[1]]
     return(h)
   }
   if(!all(vapply(hyps, is.formula, logical(1)))) {
