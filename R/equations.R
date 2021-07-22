@@ -72,10 +72,8 @@ as.character.expr_sum <- function(object) {
           object@num <- new("expr_frac", num = as.integer(div))
         } else {
           frac <- as.integer(strsplit(attr(MASS::fractions(div), "fracs"), "/", TRUE)[[1]])
-          if(length(frac) == 2 && frac[2] < 10000) {
+          if(length(frac) == 2 && all(frac < 1000)) {
             object@num <- simplify.expr_num(new("expr_frac", num = frac[1], den = frac[2]))
-          } else {
-            object@num <- new("expr_real", num = div)
           }
         }
         for(i in seq_along(object)) {
