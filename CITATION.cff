@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Rabe
+    given-names: Maximilian M.
+    orcid: https://orcid.org/0000-0002-2556-5644
+  - family-names: Vasishth
+    given-names: Shravan
+    orcid: https://orcid.org/0000-0003-2027-1994
+  - family-names: Hohenstein
+    given-names: Sven
+    orcid: https://orcid.org/0000-0002-9708-1593
+  - family-names: Kliegl
+    given-names: Reinhold
+    orcid: https://orcid.org/0000-0002-0180-8488
+  - family-names: Schad
+    given-names: Daniel J.
+    orcid: https://orcid.org/0000-0003-2586-6823
+title: "hypr: An R package for hypothesis-driven contrast coding"
+version: 0.2.1
+doi: 10.5281/zenodo.3765842
+date-released: 2021-06-07
