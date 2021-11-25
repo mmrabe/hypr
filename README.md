@@ -1,10 +1,12 @@
-hypr
-====
+# hypr
 
 [![CRAN](https://www.r-pkg.org/badges/version/hypr)](https://cran.r-project.org/package=hypr)
 [![downloads](https://cranlogs.r-pkg.org/badges/hypr)](https://cran.r-project.org/package=hypr)
-[![status](https://joss.theoj.org/papers/10.21105/joss.02134/status.svg)](https://joss.theoj.org/papers/10.21105/joss.02134)
+[![JOSS publication
+status](https://joss.theoj.org/papers/10.21105/joss.02134/status.svg)](https://joss.theoj.org/papers/10.21105/joss.02134)
 [![DOI](https://zenodo.org/badge/208564895.svg)](https://zenodo.org/badge/latestdoi/208564895)
+[![Package
+status](https://github.com/mmrabe/hypr/actions/workflows/r.yml/badge.svg)](https://github.com/mmrabe/hypr/actions/workflows/r.yml)
 
 hypr is an R package for easy translation between experimental (null)
 hypotheses and contrast matrices as used for linear regression. For an
@@ -12,8 +14,7 @@ extensive overview of the package functions, see the `hypr-intro`
 vignette, e.g. by running `vignette("hypr-intro")` after installing the
 package.
 
-Installation
-------------
+## Installation
 
 Install from CRAN within R using:
 
@@ -27,8 +28,7 @@ Install the development version in R using `devtools`:
 devtools::install_github("mmrabe/hypr", build_vignettes = TRUE)
 ```
 
-Deriving contrast matrices
---------------------------
+## Deriving contrast matrices
 
 For a treatment contrast with a baseline and three treatment conditions:
 
@@ -84,8 +84,7 @@ contrasts(fac) <- contr.hypothesis(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
 
 For more information, see `vignette("hypr-regression")`.
 
-Deriving research hypotheses
-----------------------------
+## Deriving research hypotheses
 
 To check which reserach (null) hypotheses a given contrast matrix is
 testing, we can create an empty hypr object.
@@ -159,8 +158,7 @@ The derived hypotheses can be rewritten as:
 
 For more information, see `vignette("hypr-contrasts")`.
 
-Community guidelines
---------------------
+## Community guidelines
 
 If you want to report a bug, are having technical difficulties or want
 to recommend features, it’s best to open a [Github
@@ -168,4 +166,4 @@ Issue](https://github.com/mmrabe/hypr/issues/new/choose). If you want to
 suggest a specific implementation of a feature or bug fix, you’re
 welcome to fork the repository and submit a pull request! Alternatively,
 if you are having problems or questions, you can also send an e-mail
-(<a href="mailto:maximilian.rabe@uni-potsdam.de" class="email">maximilian.rabe@uni-potsdam.de</a>).
+(<maximilian.rabe@uni-potsdam.de>).
