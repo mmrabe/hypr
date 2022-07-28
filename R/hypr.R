@@ -110,7 +110,7 @@ setClass("hypr", slots=c(eqs = "list", hmat = "matrix", cmat = "matrix"))
 
 show.hypr <- function(object) {
   check_argument(object, "hypr")
-  hypr_call <- as.call(c(list(as.name("hypr")), formula(object), list(levels = levels(object))))
+  hypr_call <- as.call(object)
   if(length(object@eqs) == 0) {
     cat("This hypr object does not contain hypotheses.")
   } else {
@@ -685,6 +685,18 @@ names.hypr <- function(x) {
 #'
 #' @export
 setMethod("names", signature(x="hypr"), names.hypr)
+
+as.call.hypr <- function(x) {
+  check_argument(x, "hypr")
+  as.call(c(list(as.name("hypr")), formula(x), list(levels = levels(x))))
+}
+
+#' @describeIn hypr Transform \code{hypr} object to a reproducible function call
+#'
+#' @return A \code{call} object that reproduces the \code{hypr} object
+#'
+#' @export
+setMethod("as.call", signature(x="hypr"), as.call.hypr)
 
 `names<-.hypr` <- function(x, value) {
   check_argument(x, "hypr")

@@ -7,6 +7,7 @@
 \alias{levels,hypr-method}
 \alias{nlevels,hypr-method}
 \alias{names,hypr-method}
+\alias{as.call,hypr-method}
 \alias{names<-,hypr-method}
 \alias{levels<-,hypr-method}
 \alias{formula,hypr-method}
@@ -20,6 +21,8 @@
 \S4method{nlevels}{hypr}(x)
 
 \S4method{names}{hypr}(x)
+
+\S4method{as.call}{hypr}(x)
 
 \S4method{names}{hypr}(x) <- value
 
@@ -43,6 +46,8 @@ An integer denoting the number of levels
 
 A character vector of contrast names
 
+A \code{call} object that reproduces the \code{hypr} object
+
 A \code{list} of null hypothesis equations
 }
 \description{
@@ -60,6 +65,8 @@ To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
 \item \code{nlevels}: Retrieve the number of levels (variable names) used in a \code{hypr} object
 
 \item \code{names}: Retrieve the contrast names used in a \code{hypr} object
+
+\item \code{as.call}: Transform \code{hypr} object to a reproducible function call
 
 \item \code{names<-}: Set the contrast names used in a \code{hypr} object
 
