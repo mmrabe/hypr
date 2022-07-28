@@ -108,7 +108,7 @@ as.character.expr_sum <- function(object) {
 
 as.formula.expr_sum <- function(object, env = parent.frame()) {
   if(length(object) == 0) {
-    return(0~0)
+    return(~0)
   }
   ret <- as.expression.expr_coef(object[[1]])
   for(el in object[-1]) {
@@ -120,7 +120,7 @@ as.formula.expr_sum <- function(object, env = parent.frame()) {
       ret <- call("+", ret, as.expression.expr_coef(el))
     }
   }
-  call("~", ret, 0)
+  call("~", ret)
 }
 
 
