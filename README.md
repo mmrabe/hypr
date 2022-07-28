@@ -52,7 +52,7 @@ trtC
     ## H0.4: 0 = mu4 - mu1
     ## 
     ## Call:
-    ## hypr(mu1 ~ 0, mu2 - mu1 ~ 0, mu3 - mu1 ~ 0, mu4 - mu1 ~ 0, levels = c("mu1", 
+    ## hypr(~mu1, ~mu2 - mu1, ~mu3 - mu1, ~mu4 - mu1, levels = c("mu1", 
     ## "mu2", "mu3", "mu4"))
     ## 
     ## Hypothesis matrix (transposed):
@@ -129,8 +129,8 @@ testC
     ##         H0.4: 0 = -X1 + X4
     ## 
     ## Call:
-    ## hypr(Intercept = X1 ~ 0, `2` = -X1 + X2 ~ 0, `3` = -X1 + X3 ~ 
-    ##     0, `4` = -X1 + X4 ~ 0, levels = c("X1", "X2", "X3", "X4"))
+    ## hypr(Intercept = ~X1, `2` = ~-X1 + X2, `3` = ~-X1 + X3, `4` = ~-X1 + 
+    ##     X4, levels = c("X1", "X2", "X3", "X4"))
     ## 
     ## Hypothesis matrix (transposed):
     ##    Intercept 2  3  4 
