@@ -4,6 +4,7 @@
 #' @importFrom MASS as.fractions fractions mvrnorm ginv
 #' @importFrom cli style_bold col_red col_grey
 #' @importFrom magrittr %>%
+#' @importFrom Matrix Matrix
 NULL
 
 setClass("hypr_cmat", contains = "matrix")

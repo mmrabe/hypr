@@ -19,6 +19,7 @@ Imports:
     methods,
     cli,
     magrittr,
+    Matrix,
 Suggests: 
     knitr,
     rmarkdown,
