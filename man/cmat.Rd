@@ -20,9 +20,9 @@ contr.hypothesis(
   as_fractions = FALSE
 )
 
-\S4method{contrasts}{factor,ANY,hypr}(x, how.many) <- value
+\S4method{contrasts}{factor,ANY,hypr}(x, how.many = NULL) <- value
 
-\S4method{contrasts}{factor,ANY,hypr_cmat}(x, how.many) <- value
+\S4method{contrasts}{factor,ANY,hypr_cmat}(x, how.many = NULL) <- value
 
 contr.hypothesis(
   x,
@@ -57,17 +57,22 @@ Basic specification of contrasts in R is accomplished with basic R functions \co
 }
 \section{Functions}{
 \itemize{
-\item \code{cmat<-}: Set contrast matrix
+\item \code{cmat(x, add_intercept = FALSE, remove_intercept = FALSE) <- value}: Set contrast matrix
 
-\item \code{contr.hypothesis}: Retrieve contrast matrix with sensible intercept default to override factor contrasts
+\item \code{contr.hypothesis()}: Retrieve contrast matrix with sensible intercept default to override factor contrasts
 
-\item \code{contrasts<-,factor,ANY,hypr-method}: Update factor contrasts
+\item \code{contrasts(x = factor, how.many = ANY) <- value}: Update factor contrasts
 
-\item \code{contrasts<-,factor,ANY,hypr_cmat-method}: Update factor contrasts
+\item \code{contrasts(x = factor, how.many = ANY) <- value}: Update factor contrasts
 
-\item \code{contr.hypothesis<-}: Update contrast matrix with sensible intercept default
+\item \code{contr.hypothesis(
+  x,
+  add_intercept = NULL,
+  remove_intercept = FALSE,
+  as_fractions = FALSE
+) <- value}: Update contrast matrix with sensible intercept default
+
 }}
-
 \examples{
 
 h <- hypr(mu1~0, mu2~mu1)

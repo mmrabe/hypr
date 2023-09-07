@@ -33,10 +33,10 @@ The functions \code{is_centered(x)} and \code{which_centered()} indicate which c
 }
 \section{Functions}{
 \itemize{
-\item \code{is_centered}: Check which contrasts of \code{x} are centered
+\item \code{is_centered()}: Check which contrasts of \code{x} are centered
 
-\item \code{all_centered}: Check whether all contrasts of \code{x} are centered
+\item \code{all_centered()}: Check whether all contrasts of \code{x} are centered
 
-\item \code{which_centered}: Check which contrasts of \code{x} are centered
+\item \code{which_centered()}: Check which contrasts of \code{x} are centered
+
 }}
-

@@ -48,19 +48,19 @@ These functions can be used to translate between null hypothesis equations, hypo
 }
 \section{Functions}{
 \itemize{
-\item \code{eqs2hmat}: Convert null hypothesis equations to hypothesis matrix
+\item \code{eqs2hmat()}: Convert null hypothesis equations to hypothesis matrix
 
-\item \code{eqs2cmat}: Convert null hypothesis equations to contrast matrix
+\item \code{eqs2cmat()}: Convert null hypothesis equations to contrast matrix
 
-\item \code{hmat2cmat}: Convert hypothesis matrix to contrast matrix
+\item \code{hmat2cmat()}: Convert hypothesis matrix to contrast matrix
 
-\item \code{cmat2hmat}: Convert contrast matrix to hypothesis matrix
+\item \code{cmat2hmat()}: Convert contrast matrix to hypothesis matrix
 
-\item \code{hmat2eqs}: Convert hypothesis matrix to null hypothesis equations
+\item \code{hmat2eqs()}: Convert hypothesis matrix to null hypothesis equations
 
-\item \code{cmat2eqs}: Convert contrast matrix to null hypothesis equations
+\item \code{cmat2eqs()}: Convert contrast matrix to null hypothesis equations
+
 }}
-
 \examples{
 
 # The following examples are based on a 2-level treatment contrast (i.e., baseline and treatment).

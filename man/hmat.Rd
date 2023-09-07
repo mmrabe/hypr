@@ -30,13 +30,13 @@ Use these functions to retrieve or set a hypr object's hypothesis matrix. If use
 }
 \section{Functions}{
 \itemize{
-\item \code{thmat}: Retrieve transposed hypothesis matrix
+\item \code{thmat()}: Retrieve transposed hypothesis matrix
 
-\item \code{hmat<-}: Set hypothesis matrix
+\item \code{hmat(x) <- value}: Set hypothesis matrix
 
-\item \code{thmat<-}: Set transposed hypothesis matrix
+\item \code{thmat(x) <- value}: Set transposed hypothesis matrix
+
 }}
-
 \examples{
 
 h <- hypr(mu1~0, mu2~mu1)

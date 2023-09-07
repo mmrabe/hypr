@@ -32,15 +32,15 @@ There are functions available to check whether a \code{hypr} object contains an 
 }
 \section{Functions}{
 \itemize{
-\item \code{add_intercept}: Add an intercept column if there is none
+\item \code{add_intercept()}: Add an intercept column if there is none
 
-\item \code{remove_intercept}: Remove the intercept column if there is one
+\item \code{remove_intercept()}: Remove the intercept column if there is one
 
-\item \code{which_intercept}: Return indices, not a logical vector of intercept columns
+\item \code{which_intercept()}: Return indices, not a logical vector of intercept columns
 
-\item \code{has_intercept}: Check whether any of the contrasts is an intercept
+\item \code{has_intercept()}: Check whether any of the contrasts is an intercept
+
 }}
-
 \examples{
 
 h1 <- hypr(mu1~0, mu2~mu1)

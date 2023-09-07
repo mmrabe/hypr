@@ -26,13 +26,13 @@ You can combine one or more \code{hypr} objects, i.e. combine their hypothesis t
 }
 \section{Functions}{
 \itemize{
-\item \code{*,hypr,hypr-method}: Interaction of \code{e1} and \code{e2}
+\item \code{e1 * e2}: Interaction of \code{e1} and \code{e2}
 
-\item \code{&,hypr,hypr-method}: Interaction and main contrasts of \code{e1} and \code{e2}
+\item \code{e1 & e2}: Interaction and main contrasts of \code{e1} and \code{e2}
 
-\item \code{/,hypr,hypr-method}: Nesting levels of \code{e2} within \code{e1}
+\item \code{e1 / e2}: Nesting levels of \code{e2} within \code{e1}
+
 }}
-
 \examples{
 
 (h1 <- hypr(a~i, b~i)) # a hypr object of two treatments

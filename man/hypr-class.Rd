@@ -58,25 +58,25 @@ To generate a hypr object, use the \code{\link[hypr:hypr]{hypr}} function.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
+\item \code{show(hypr)}: Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
 
-\item \code{levels}: Retrieve the levels (variable names) used in a \code{hypr} object
+\item \code{levels(hypr)}: Retrieve the levels (variable names) used in a \code{hypr} object
 
-\item \code{nlevels}: Retrieve the number of levels (variable names) used in a \code{hypr} object
+\item \code{nlevels(hypr)}: Retrieve the number of levels (variable names) used in a \code{hypr} object
 
-\item \code{names}: Retrieve the contrast names used in a \code{hypr} object
+\item \code{names(hypr)}: Retrieve the contrast names used in a \code{hypr} object
 
-\item \code{as.call}: Transform \code{hypr} object to a reproducible function call
+\item \code{as.call(hypr)}: Transform \code{hypr} object to a reproducible function call
 
-\item \code{names<-}: Set the contrast names used in a \code{hypr} object
+\item \code{names(hypr) <- value}: Set the contrast names used in a \code{hypr} object
 
-\item \code{levels<-}: Set the levels used in a \code{hypr} object
+\item \code{levels(hypr) <- value}: Set the levels used in a \code{hypr} object
 
-\item \code{formula}: Retrieve a \code{hypr} object’s null hypothesis equations.
+\item \code{formula(hypr)}: Retrieve a \code{hypr} object’s null hypothesis equations.
 
-\item \code{formula<-}: Modify a \code{hypr} object’s null hypothesis equations
+\item \code{formula(hypr) <- value}: Modify a \code{hypr} object’s null hypothesis equations
+
 }}
-
 \section{Slots}{
 
 \describe{
