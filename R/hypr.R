@@ -1183,9 +1183,39 @@ filler_contrasts <- function(x, how.many = nlevels(x), rescale = TRUE) {
 #' @describeIn filler_contrasts Return indices of filler contrasts
 #' @export
 which_filler <- function(x) {
-  if(!inherits(x, "hypr")) stop("`x` must be a hypr object!")
-  if(!is.null(attr(x@cmat, "which_fillers"))) return(attr(x@cmat, "which_fillers"))
-  integer(0)
+  if(inherits(x, "hypr") || inherits(x, "hypr_cmat")) {
+    cm <- if(inherits(x, "hypr")) cmat(x, add_intercept = FALSE, remove_intercept = FALSE) else x
+    if(!is.null(attr(cm, "which_fillers"))) return(attr(cm, "which_fillers"))
+    integer(0)
+  } else stop("`x` must be a hypr object or hypr cmat!")
+}
+
+#' @describeIn filler_contrasts Return indices of filler contrasts
+#' @export
+which_target <- function(x) {
+  if(inherits(x, "hypr") || inherits(x, "hypr_cmat")) {
+    cm <- if(inherits(x, "hypr")) cmat(x, add_intercept = FALSE, remove_intercept = FALSE) else x
+    setdiff(seq_len(ncol(cm)), which_filler(cm))
+  } else stop("`x` must be a hypr object or hypr cmat!")
+}
+
+
+#' @describeIn filler_contrasts Return names of filler contrasts
+#' @export
+filler_names <- function(x) {
+  if(inherits(x, "hypr") || inherits(x, "hypr_cmat")) {
+    cm <- if(inherits(x, "hypr")) cmat(x, add_intercept = FALSE, remove_intercept = FALSE) else x
+    colnames(cm)[which_filler(cm)]
+  } else stop("`x` must be a hypr object or hypr cmat!")
+}
+
+#' @describeIn filler_contrasts Return names of target contrasts
+#' @export
+target_names <- function(x) {
+  if(inherits(x, "hypr") || inherits(x, "hypr_cmat")) {
+    cm <- if(inherits(x, "hypr")) cmat(x, add_intercept = FALSE, remove_intercept = FALSE) else x
+    colnames(cm)[-which_filler(cm)]
+  } else stop("`x` must be a hypr object or hypr cmat!")
 }
 
 
