@@ -1170,8 +1170,8 @@ filler_contrasts <- function(x, how.many = nlevels(x), rescale = TRUE) {
     if(rescale) {
       new_contrasts <- new_contrasts / rep(apply(new_contrasts, 2, minabsnz), nrow(qy)) * minabsnz(cm)
     }
-    if(is.null(colnames(cm))) colnames(cm) <- if(ncol(cm) == 2) c("Intercept", "target") else c("Intercept", paste0("target", seq_len(ncol(cm)-1)))
-    colnames(new_contrasts) <- if(ncol(new_contrasts) == 1) "filler" else paste0("filler", seq_len(ncol(new_contrasts)))
+    if(is.null(colnames(cm))) colnames(cm) <- c("Intercept", paste0("T", seq_len(ncol(cm)-1)))
+    colnames(new_contrasts) <- paste0("F", seq_len(ncol(new_contrasts)))
     new_cm <- cbind(cm, new_contrasts)
     attr(new_cm, "which_fillers") <- sort(c(seq_len(ncol(new_contrasts)) + ncol(cm), attr(cm, "which_fillers")))
     cmat(x, add_intercept = FALSE, remove_intercept = add_int) <- new_cm
