@@ -124,7 +124,7 @@ show.hypr <- function(object) {
     eq.names <- sprintf("H0.%s", if(is.null(names(object@eqs))) seq_along(object@eqs) else names(object@eqs))
     dropped.hyps <- attr(object@hmat, "dropped.hyps")
     kept.hyps <- setdiff(seq_along(object@eqs), dropped.hyps)
-    eqs.str <- vapply(object@eqs, as.character.expr_sum, "")
+    eqs.str <- vapply(object@eqs, .as.character.expr_sum, "")
     longest.eqs.str <- max(nchar(eqs.str))
     longest.eqs.name <- max(nchar(eq.names))
     for(i in seq_along(object@eqs)) {
@@ -281,7 +281,7 @@ expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fr
     vapply(levels, function(j) {
       for(el in expr[[i]]) {
         if(setequal_exact(el@var, j)) {
-          return(as.fractions.expr_num(el@num))
+          return(.as.fractions.expr_num(el@num))
         }
       }
       return(0)
@@ -342,7 +342,7 @@ cmat2hmat <- function(cmat, as_fractions = TRUE) {
 #' @describeIn conversions Convert hypothesis matrix to null hypothesis equations
 #' @export
 hmat2eqs <- function(hmat, as_fractions = TRUE) {
-  ret <- sapply(hmat2expr(hmat, as_fractions = as_fractions), as.formula.expr_sum, simplify = FALSE)
+  ret <- sapply(hmat2expr(hmat, as_fractions = as_fractions), .as.formula.expr_sum, simplify = FALSE)
   attr(ret, "which_filler") <- attr(hmat, "which_filler")
   ret
 }
@@ -753,7 +753,7 @@ setMethod("levels<-", signature(x="hypr"), `levels<-.hypr`)
 #' @export
 setGeneric("formula<-", function(x, ..., value) UseMethod("formula<-", x))
 
-formula.hypr <- function(x, ...) sapply(x@eqs, as.formula.expr_sum, simplify = FALSE)
+formula.hypr <- function(x, ...) sapply(x@eqs, .as.formula.expr_sum, simplify = FALSE)
 
 `formula<-.hypr` <- function(x, ..., value) hypr(value)
 

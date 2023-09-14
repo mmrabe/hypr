@@ -4,24 +4,24 @@
 
 
 setClass("expr_num")
-as.character.expr_num <- function(object) if(is(object, "expr_frac")) as.character.expr_frac(object) else if(is(object, "expr_real")) as.character.expr_real(object) else as.character(object)
+.as.character.expr_num <- function(object) if(is(object, "expr_frac")) .as.character.expr_frac(object) else if(is(object, "expr_real")) .as.character.expr_real(object) else as.character(object)
 
 setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 1L, den = 1L), contains = "expr_num")
-as.character.expr_frac <- function(object) if(object@den!=1L) sprintf("%d/%d", object@num, object@den) else as.character(object@num)
+.as.character.expr_frac <- function(object) if(object@den!=1L) sprintf("%d/%d", object@num, object@den) else as.character(object@num)
 #setMethod("show", "expr_frac", show.expr_frac)
 
 setClass("expr_real", slots = c(num = "numeric"), prototype = list(num = 1), contains = "expr_num")
-as.character.expr_real <- function(object) as.character(object@num)
+.as.character.expr_real <- function(object) as.character(object@num)
 #setMethod("show", "expr_real", show.expr_real)
 
 setClass("expr_coef", slots = c(num = "expr_num", var = "character"))
-as.character.expr_coef <- function(object) {
+.as.character.expr_coef <- function(object) {
   ret <- character(0)
-  if(as.numeric.expr_num(object@num) != 1 || length(object@var) == 0) {
-    if(as.numeric.expr_num(object@num) == -1) {
+  if(.as.numeric.expr_num(object@num) != 1 || length(object@var) == 0) {
+    if(.as.numeric.expr_num(object@num) == -1) {
       ret <- c(ret, "-")
     } else {
-      ret <- c(ret, as.character.expr_num(object@num))
+      ret <- c(ret, .as.character.expr_num(object@num))
       if(length(object@var) > 0) {
         ret <- c(ret, "*")
       }
@@ -31,7 +31,7 @@ as.character.expr_coef <- function(object) {
   paste(ret, collapse="")
 }
 #setMethod("show", "expr_coef", show.expr_coef)
-as.expression.expr_coef <- function(x, ...) {
+.as.expression.expr_coef <- function(x, ...) {
   if(is(x@num, "expr_real")) {
     ret <- x@num@num
   } else if(is(x@num, "expr_frac")) {
@@ -46,9 +46,9 @@ as.expression.expr_coef <- function(x, ...) {
     for(var in x@var[-1]) {
       var_calls <- call("*", var_calls, as.symbol(var))
     }
-    if(as.numeric.expr_num(x@num) == 1) {
+    if(.as.numeric.expr_num(x@num) == 1) {
       ret <- var_calls
-    } else if(as.numeric.expr_num(x@num) == -1) {
+    } else if(.as.numeric.expr_num(x@num) == -1) {
       ret <- call("-", var_calls)
     } else {
       ret <- call("*", ret, var_calls)
@@ -56,16 +56,16 @@ as.expression.expr_coef <- function(x, ...) {
   }
   ret
 }
-#setMethod("as.expression", "expr_coef", as.expression.expr_coef)
+#setMethod("as.expression", "expr_coef", .as.expression.expr_coef)
 
 setClass("expr_sum", contains = "list", slots = c(num = "expr_num"), prototype = prototype(num = new("expr_frac", num=1L, den=1L)))
-as.character.expr_sum <- function(object) {
+.as.character.expr_sum <- function(object) {
   if(length(object) > 0) {
     # reformat
     if(length(object) > 1) {
-      div <- gcd(as.numeric.expr_num(object[[1]]@num), as.numeric.expr_num(object[[2]]@num))
+      div <- gcd(.as.numeric.expr_num(object[[1]]@num), .as.numeric.expr_num(object[[2]]@num))
       for(i in seq_along(object)[c(-1,-2)]) {
-        div <- gcd(div, as.numeric.expr_num(object[[i]]@num))
+        div <- gcd(div, .as.numeric.expr_num(object[[i]]@num))
       }
       if(div != 1) {
         if(div %% 1 == 0) {
@@ -85,19 +85,19 @@ as.character.expr_sum <- function(object) {
     ret <- character(0)
     for(i in seq_along(object)) {
       if(i>1) {
-        if(as.numeric.expr_num(object[[i]]@num) >= 0) {
-          ret <- c(ret, "+", as.character.expr_coef(object[[i]]))
+        if(.as.numeric.expr_num(object[[i]]@num) >= 0) {
+          ret <- c(ret, "+", .as.character.expr_coef(object[[i]]))
         } else {
-          ret <- c(ret, "-", as.character.expr_coef(multiply_expr(object[[i]], new("expr_coef", num = new("expr_frac", num = -1L)))))
+          ret <- c(ret, "-", .as.character.expr_coef(multiply_expr(object[[i]], new("expr_coef", num = new("expr_frac", num = -1L)))))
         }
       } else {
-        ret <- c(ret, as.character.expr_coef(object[[i]]))
+        ret <- c(ret, .as.character.expr_coef(object[[i]]))
       }
     }
-    if(as.numeric.expr_num(object@num) != 1) {
+    if(.as.numeric.expr_num(object@num) != 1) {
       if(is(object@num, "expr_frac") && object@num@num == 1) paste0("(", paste(ret, collapse=" "), ")", "/", object@num@den)
       else if(is(object@num, "expr_frac") && object@num@den == 1) paste0(object@num, "*", "(", paste(ret, collapse=" "), ")")
-      else paste0(as.character.expr_num(object@num), "*", "(", paste(ret, collapse=" "), ")")
+      else paste0(.as.character.expr_num(object@num), "*", "(", paste(ret, collapse=" "), ")")
     }
     else paste(ret, collapse=" ")
   } else {
@@ -106,49 +106,49 @@ as.character.expr_sum <- function(object) {
 }
 #setMethod("show", "expr_sum", show.expr_sum)
 
-as.formula.expr_sum <- function(object, env = parent.frame()) {
+.as.formula.expr_sum <- function(object, env = parent.frame()) {
   if(length(object) == 0) {
     return(~0)
   }
-  ret <- as.expression.expr_coef(object[[1]])
+  ret <- .as.expression.expr_coef(object[[1]])
   for(el in object[-1]) {
-    if(as.numeric.expr_num(el@num) == 0) {
+    if(.as.numeric.expr_num(el@num) == 0) {
       next
-    } else if(as.numeric.expr_num(el@num) < 0) {
-      ret <- call("-", ret, as.expression.expr_coef(multiply_expr(el, new("expr_coef", num = new("expr_frac", num = -1L)))))
+    } else if(.as.numeric.expr_num(el@num) < 0) {
+      ret <- call("-", ret, .as.expression.expr_coef(multiply_expr(el, new("expr_coef", num = new("expr_frac", num = -1L)))))
     } else {
-      ret <- call("+", ret, as.expression.expr_coef(el))
+      ret <- call("+", ret, .as.expression.expr_coef(el))
     }
   }
   call("~", ret)
 }
 
 
-as.numeric.expr_num <- function(x) {
+.as.numeric.expr_num <- function(x) {
   if(is(x, "expr_frac")) x@num/x@den
   else if(is(x, "expr_real")) x@num
   else as.numeric(x)
 }
 
-as.fractions.expr_num <- function(x) {
+.as.fractions.expr_num <- function(x) {
   if(is(x, "expr_frac")) MASS::as.fractions(x@num)/MASS::as.fractions(x@den)
   else MASS::as.fractions(x@num)
 }
 
-#setMethod("as.numeric", signature(x="expr_num"), as.numeric.expr_num)
-#setMethod("as.fractions", signature(x="expr_num"), as.fractions.expr_num)
+#setMethod("as.numeric", signature(x="expr_num"), .as.numeric.expr_num)
+#setMethod("as.fractions", signature(x="expr_num"), .as.fractions.expr_num)
 
 `*.expr_num` <- function(a, b) {
   if(is(a, "expr_frac") && is(b, "expr_frac")) {
     simplify.expr_num(new("expr_frac", num = a@num*b@num, den = a@den*b@den))
   } else {
-    new("expr_real", num = as.numeric.expr_num(a)*as.numeric.expr_num(b))
+    new("expr_real", num = .as.numeric.expr_num(a)*.as.numeric.expr_num(b))
   }
 }
 #setMethod("*", signature("expr_num", "expr_num"), function(e1, e2) `*.expr_num`(e1, e2))
 
 `/.expr_num` <- function(a, b) {
-  b <- if(is(b, "expr_frac")) new("expr_frac", num = b@den, den = b@num) else new("expr_real", num = 1/as.numeric.expr_num(b))
+  b <- if(is(b, "expr_frac")) new("expr_frac", num = b@den, den = b@num) else new("expr_real", num = 1/.as.numeric.expr_num(b))
   `*.expr_num`(a, b)
 }
 #setMethod("/", signature("expr_num", "expr_num"), function(e1, e2) `/.expr_num`(e1, e2))
@@ -162,13 +162,13 @@ as.fractions.expr_num <- function(x) {
       simplify.expr_num(new("expr_frac", num = a@num+b@num, den = a@den))
     }
   } else {
-    new("expr_real", num = as.numeric.expr_num(a)+as.numeric.expr_num(b))
+    new("expr_real", num = .as.numeric.expr_num(a)+.as.numeric.expr_num(b))
   }
 }
 #setMethod("+", signature("expr_num", "expr_num"), function(e1, e2) `+.expr_num`(e1, e2))
 
 `-.expr_num` <- function(a, b) {
-  b <- if(is(b, "expr_frac")) new("expr_frac", num = -b@num, den = b@den) else new("expr_real", num = -as.numeric.expr_num(b@num))
+  b <- if(is(b, "expr_frac")) new("expr_frac", num = -b@num, den = b@den) else new("expr_real", num = -.as.numeric.expr_num(b@num))
   `+.expr_num`(a, b)
 }
 
@@ -185,12 +185,12 @@ simplify.expr_num <- function(a) {
 #setMethod("-", signature("expr_num", "expr_num"), function(e1, e2) `-.expr_num`(e1, e2))
 #setMethod("-", signature("expr_num"), function(e1) new("expr_frac", num=0L, den=1L) - e1)
 
-`==.expr_num` <- function(a, b) as.numeric.expr_num(a) == as.numeric.expr_num(b)
+`==.expr_num` <- function(a, b) .as.numeric.expr_num(a) == .as.numeric.expr_num(b)
 #setMethod("==", signature("expr_num", "expr_num"), function(e1, e2) `==.expr_num`(e1, e2))
-`<.expr_num` <- function(a, b) as.numeric.expr_num(a) < as.numeric.expr_num(b)
+`<.expr_num` <- function(a, b) .as.numeric.expr_num(a) < .as.numeric.expr_num(b)
 #setMethod("<", signature("expr_num", "expr_num"), function(e1, e2) `<.expr_num`(e1, e2))
 #setMethod("<=", signature("expr_num", "expr_num"), function(e1, e2) `<.expr_num`(e1, e2) || `==.expr_num`(e1, e2))
-`>.expr_num` <- function(a, b) as.numeric.expr_num(a) > as.numeric.expr_num(b)
+`>.expr_num` <- function(a, b) .as.numeric.expr_num(a) > .as.numeric.expr_num(b)
 #setMethod(">", signature("expr_num", "expr_num"), function(e1, e2) `>.expr_num`(e1, e2))
 #setMethod(">=", signature("expr_num", "expr_num"), function(e1, e2) `>.expr_num`(e1, e2) || `==.expr_num`(e1, e2))
 
@@ -246,7 +246,7 @@ simplify_expr_sum <- function(expr) {
       ret[[length(ret)+1]] <- el
     }
   }
-  return(as(ret[vapply(ret, function(x) as.numeric.expr_num(x@num) != 0, logical(1))], "expr_sum"))
+  return(as(ret[vapply(ret, function(x) .as.numeric.expr_num(x@num) != 0, logical(1))], "expr_sum"))
 }
 
 setequal_exact <- function(x, y) {
@@ -270,7 +270,7 @@ simplify_expr <- function(expr) {
     if(is(ret, "expr_coef")) {
       ret <- as(list(ret), "expr_sum")
     }
-    return(as(ret[vapply(ret, function(x) as.numeric.expr_num(x@num) != 0, logical(1))], "expr_sum"))
+    return(as(ret[vapply(ret, function(x) .as.numeric.expr_num(x@num) != 0, logical(1))], "expr_sum"))
   } else if(is.numeric(expr)) {
     if(expr %% 1 == 0) {
       num <- new("expr_frac", num = as.integer(expr), den = 1L)
