@@ -2,9 +2,12 @@
 % Please edit documentation in R/hypr.R
 \name{filler_contrasts}
 \alias{filler_contrasts}
+\alias{which_filler}
 \title{Generate filler contrasts}
 \usage{
 filler_contrasts(x, how.many = nlevels(x), rescale = TRUE)
+
+which_filler(x)
 }
 \arguments{
 \item{x}{A hypr object}
@@ -16,6 +19,11 @@ filler_contrasts(x, how.many = nlevels(x), rescale = TRUE)
 \description{
 Fill free degrees of freedom with orthogonal filler contrasts.
 }
+\section{Functions}{
+\itemize{
+\item \code{which_filler()}: Return indices of filler contrasts
+
+}}
 \examples{
 
 # A complete Helmert contrast matrix for 4 levels:

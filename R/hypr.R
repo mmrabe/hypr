@@ -136,7 +136,10 @@ show.hypr <- function(object) {
         cat(strrep(" ", longest.eqs.str-nchar(eqs.str[i])))
         cat(" )")
       }
-      if(i %in% kept.hyps[which_intercept(object)]) {
+      if(i %in% attr(object@cmat, "which_fillers")) {
+        cat(strrep(" ", longest.eqs.str-nchar(eqs.str[i])))
+        cat(col_grey("  (Filler)"))
+      } else if(i %in% kept.hyps[which_intercept(object)]) {
         cat(strrep(" ", longest.eqs.str-nchar(eqs.str[i])))
         cat(col_grey("  (Intercept)"))
       }
@@ -305,6 +308,7 @@ expr2hmat <- function(expr, levels = NULL, order_levels = missing(levels), as_fr
       warning(sprintf("Your hypotheses are not linearly independent. The resulting hypothesis matrix was rank-deficient. Dropped %s.", paste(dropped.hyps.names, collapse=", ")))
     }
   }
+  attr(ret, "which_filler") <- attr(expr, "which_filler")
   if(as_fractions) ret <- as.fractions(ret)
   ret
 }
@@ -317,23 +321,31 @@ eqs2cmat <- function(eqs, as_fractions = TRUE) hmat2cmat(eqs2hmat(eqs), as_fract
 #' @export
 hmat2cmat <- function(hmat, as_fractions = TRUE) {
   if(nrow(hmat) == 0)
-    matrix(0, ncol(hmat), 0, dimnames = list(colnames(hmat),NULL))
+    ret <- matrix(0, ncol(hmat), 0, dimnames = list(colnames(hmat),NULL))
   else
-    ginv2(hmat, as_fractions = as_fractions)
+    ret <- ginv2(hmat, as_fractions = as_fractions)
+  attr(ret, "which_filler") <- attr(hmat, "which_filler")
+  ret
 }
 
 #' @describeIn conversions Convert contrast matrix to hypothesis matrix
 #' @export
 cmat2hmat <- function(cmat, as_fractions = TRUE) {
   if(nrow(cmat) > 0 && ncol(cmat) > 0)
-    ginv2(cmat, as_fractions = as_fractions)
+    ret <- ginv2(cmat, as_fractions = as_fractions)
   else
-    matrix(0, ncol = 0, nrow = 0)
+    ret <- matrix(0, ncol = 0, nrow = 0)
+  attr(ret, "which_filler") <- attr(hmat, "which_filler")
+  ret
 }
 
 #' @describeIn conversions Convert hypothesis matrix to null hypothesis equations
 #' @export
-hmat2eqs <- function(hmat, as_fractions = TRUE) sapply(hmat2expr(hmat, as_fractions = as_fractions), as.formula.expr_sum, simplify = FALSE)
+hmat2eqs <- function(hmat, as_fractions = TRUE) {
+  ret <- sapply(hmat2expr(hmat, as_fractions = as_fractions), as.formula.expr_sum, simplify = FALSE)
+  attr(ret, "which_filler") <- attr(hmat, "which_filler")
+  ret
+}
 
 hmat2expr <- function(hmat, as_fractions = TRUE) {
   check_argument(hmat, "matrix", "numeric")
@@ -352,6 +364,7 @@ hmat2expr <- function(hmat, as_fractions = TRUE) {
     )
   })
   names(ret) <- rownames(hmat)
+  attr(ret, "which_filler") <- attr(hmat, "which_filler")
   ret
 }
 
@@ -794,6 +807,7 @@ remove_intercept <- function(x) {
 
 prepare_cmat <- function(value, add_intercept, remove_intercept) {
   intercept_col <- which_intercept(value)
+  original_attributes <- attributes(value)
   if(isTRUE(add_intercept) && isTRUE(remove_intercept)) {
     stop("Cannot add and remove intercept at the same time!")
   } else if(isTRUE(add_intercept) || (is.null(add_intercept) && length(intercept_col) == 0)) {
@@ -808,6 +822,9 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
     } else {
       value <- cbind(`Intercept` = 1, value)
     }
+    if(!is.null(original_attributes$which_fillers)) {
+      original_attributes$which_fillers <- original_attributes$which_fillers + 1L
+    }
   } else if(isTRUE(remove_intercept) || is.null(remove_intercept)) {
     if(length(intercept_col) == 0 && isTRUE(remove_intercept)) {
       stop("You are using remove_intercept=TRUE but your contrast matrix does not have an obvious intercept! Please set remove_intercept=FALSE or specify with a number corresponding to the column index you want to remove, e.g. remove_intercept=1 for removing the first column.")
@@ -816,11 +833,18 @@ prepare_cmat <- function(value, add_intercept, remove_intercept) {
       if(length(intercept_col) > 1) {
         stop("You are using remove_intercept=TRUE but your contrast matrix does not have an obvious single intercept! Please set remove_intercept=FALSE or specify with a number corresponding to the column index you want to remove, e.g. remove_intercept=1 for removing the first column.")
       }
+      if(!is.null(original_attributes$which_fillers)) {
+        original_attributes$which_fillers <- original_attributes$which_fillers - cumsum(seq_len(ncol(value)) %in% intercept_col)[original_attributes$which_fillers]
+      }
       value <- value[,-intercept_col,drop=F]
     }
   } else if(is.numeric(remove_intercept)) {
+    if(!is.null(original_attributes$which_fillers)) {
+      original_attributes$which_fillers <- original_attributes$which_fillers - cumsum(seq_len(ncol(value)) %in% remove_intercept)[original_attributes$which_fillers]
+    }
     value <- value[,-remove_intercept,drop=F]
   }
+  attributes(value) <- c(attributes(value), original_attributes[setdiff(names(original_attributes), names(attributes(value)))])
   value
 }
 
@@ -920,22 +944,17 @@ contr.hypothesis <- function(..., add_intercept = FALSE, remove_intercept = NULL
 }
 
 `contrasts<-.hypr` <- function(x, how.many, value) {
-  if(inherits(value, "hypr")) {
-    if(!missing(how.many)) {
-      value <- filler_contrasts(value, how.many)
-    }
-    cm <- contr.hypothesis(value)
-  } else if(inherits(value, "hypr_cmat")) {
-    cm <- value
+  if(inherits(value, "hypr_cmat")) {
+    value <- hypr(value)
   }
-  if(!isTRUE(all.equal(make.names(levels(x)), make.names(rownames(cm))))) {
-    warning(sprintf("The levels of the hypr object (%s) do not match the levels of the factor (%s). Please check the resulting contrast matrix for errors with contrasts(factor). To avoid errors and this warning, ensure that the order of factor levels and levels in hypr match, e.g. by creating your hypr object with hypr(..., levels = levels(factor)).",paste(rownames(cm), collapse = ", "),paste(levels(x), collapse=", ")))
+  if(!missing(how.many)) {
+    value <- filler_contrasts(value, how.many)
+  }
+  if(!isTRUE(all(make.names(levels(value)) == make.names(levels(x))))) {
+    warning(sprintf("The levels of the hypr object (%s) do not match the levels of the factor (%s). Please check the resulting contrast matrix for errors with contrasts(factor). To avoid errors and this warning, ensure that the order of factor levels and levels in hypr match, e.g. by creating your hypr object with hypr(..., levels = levels(factor)).",paste(levels(value), collapse = ", "),paste(levels(x), collapse=", ")))
   }
   ## match? cm <- cm[match(levels(x), rownames(cm)), , drop = FALSE]
-  if(missing(how.many))
-    stats::contrasts(x, how.many = ncol(cm)) <- cm
-  else
-    stats::contrasts(x, how.many) <- cm
+  attr(x, "contrasts") <- cmat(value, add_intercept = FALSE, remove_intercept = FALSE)
   x
 }
 
@@ -1031,6 +1050,7 @@ which_intercept <- function(x) which(is_intercept(x))
 has_intercept <- function(x) any(is_intercept(x))
 
 
+
 #' Contrast centering
 #'
 #' Centeredness of contrasts is critical for the interpretation of interactions and intercepts. There are functions available to check for centered contrasts and to realign contrasts so that they are centered.
@@ -1108,6 +1128,7 @@ minabsnz <- function(x) {
 #' @param how.many The total number of contrasts for the new hypr object
 #' @param rescale If \code{TRUE}, the contrast weights will be rescaled
 #'
+#' @rdname filler_contrasts
 #'
 #' @examples
 #'
@@ -1149,7 +1170,22 @@ filler_contrasts <- function(x, how.many = nlevels(x), rescale = TRUE) {
     if(rescale) {
       new_contrasts <- new_contrasts / rep(apply(new_contrasts, 2, minabsnz), nrow(qy)) * minabsnz(cm)
     }
-    cmat(x, add_intercept = FALSE, remove_intercept = add_int) <- cbind(cm, new_contrasts)
+    if(is.null(colnames(cm))) colnames(cm) <- if(ncol(cm) == 2) c("Intercept", "target") else c("Intercept", paste0("target", seq_len(ncol(cm)-1)))
+    colnames(new_contrasts) <- if(ncol(new_contrasts) == 1) "filler" else paste0("filler", seq_len(ncol(new_contrasts)))
+    new_cm <- cbind(cm, new_contrasts)
+    attr(new_cm, "which_fillers") <- sort(c(seq_len(ncol(new_contrasts)) + ncol(cm), attr(cm, "which_fillers")))
+    cmat(x, add_intercept = FALSE, remove_intercept = add_int) <- new_cm
   }
   x
 }
+
+
+#' @describeIn filler_contrasts Return indices of filler contrasts
+#' @export
+which_filler <- function(x) {
+  if(!inherits(x, "hypr")) stop("`x` must be a hypr object!")
+  if(!is.null(attr(x@cmat, "which_fillers"))) return(attr(x@cmat, "which_fillers"))
+  integer(0)
+}
+
+
