@@ -353,7 +353,7 @@ hmat2expr <- function(hmat, as_fractions = TRUE) {
   ret <- lapply(seq_len(nrow(hmat)), function(j) {
     simplify_expr_sum(
       as(lapply(seq_len(ncol(hmat)), function(i) {
-        num <- new("expr_real", num = hmat[j,i])
+        num <- new("expr_real", num = as.numeric(hmat[j,i]))
         if(as_fractions) {
           frac <- as.numeric(strsplit(attr(as.fractions(hmat[j,i]), "fracs"), "/", TRUE)[[1]])
           if(length(frac) == 2 && frac[2] <= 1000) {
@@ -1149,13 +1149,13 @@ minabsnz <- function(x) {
 #' cmat(h2)
 #'
 #' # Filling the remaining degree of freedom retrieves the contrast
-#' h3 <- filler_contrasts(h2)
+#' h3 <- filler_contrasts(h2, rescale = TRUE)
 #' cmat(h3)
 #'
-#' stopifnot(all.equal(cmat(h3)[,3], cmat(h1)[,2]))
+#' stopifnot(all.equal(cmat(h3)[,3], cmat(h1)[,2], check.attributes = FALSE))
 #'
 #' @export
-filler_contrasts <- function(x, how.many = nlevels(x), rescale = TRUE) {
+filler_contrasts <- function(x, how.many = nlevels(x), rescale = FALSE) {
   check_argument(x, "hypr")
   check_argument(how.many, "numeric")
   check_argument(rescale, "logical")

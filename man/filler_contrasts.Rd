@@ -8,7 +8,7 @@
 \alias{target_names}
 \title{Generate filler contrasts}
 \usage{
-filler_contrasts(x, how.many = nlevels(x), rescale = TRUE)
+filler_contrasts(x, how.many = nlevels(x), rescale = FALSE)
 
 which_filler(x)
 
@@ -57,9 +57,9 @@ h2 <- hypr(~ (mu2-mu1)/2,
 cmat(h2)
 
 # Filling the remaining degree of freedom retrieves the contrast
-h3 <- filler_contrasts(h2)
+h3 <- filler_contrasts(h2, rescale = TRUE)
 cmat(h3)
 
-stopifnot(all.equal(cmat(h3)[,3], cmat(h1)[,2]))
+stopifnot(all.equal(cmat(h3)[,3], cmat(h1)[,2], check.attributes = FALSE))
 
 }
