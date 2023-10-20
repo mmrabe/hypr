@@ -6,8 +6,8 @@
 setClass("expr_num")
 .as.character.expr_num <- function(object) if(is(object, "expr_frac")) .as.character.expr_frac(object) else if(is(object, "expr_real")) .as.character.expr_real(object) else as.character(object)
 
-setClass("expr_frac", slots = c(num = "integer", den = "integer"), prototype = list(num = 1L, den = 1L), contains = "expr_num")
-.as.character.expr_frac <- function(object) if(object@den!=1L) sprintf("%d/%d", object@num, object@den) else as.character(object@num)
+setClass("expr_frac", slots = c(num = "numeric", den = "numeric"), prototype = list(num = 1, den = 1), contains = "expr_num")
+.as.character.expr_frac <- function(object) if(object@den!=1L) sprintf("%.0f/%.0f", object@num, object@den) else as.character(object@num)
 #setMethod("show", "expr_frac", show.expr_frac)
 
 setClass("expr_real", slots = c(num = "numeric"), prototype = list(num = 1), contains = "expr_num")
@@ -69,9 +69,9 @@ setClass("expr_sum", contains = "list", slots = c(num = "expr_num"), prototype =
       }
       if(div != 1) {
         if(div %% 1 == 0) {
-          object@num <- new("expr_frac", num = as.integer(div))
+          object@num <- new("expr_frac", num = div)
         } else {
-          frac <- as.integer(strsplit(attr(MASS::fractions(div), "fracs"), "/", TRUE)[[1]])
+          frac <- as.numeric(strsplit(attr(fractions(div), "fracs"), "/", TRUE)[[1]])
           if(length(frac) == 2 && all(frac < 1000)) {
             object@num <- simplify.expr_num(new("expr_frac", num = frac[1], den = frac[2]))
           }
@@ -156,7 +156,7 @@ setClass("expr_sum", contains = "list", slots = c(num = "expr_num"), prototype =
 `+.expr_num` <- function(a, b) {
   if(is(a, "expr_frac") && is(b, "expr_frac")) {
     if(a@den!=b@den) {
-      lcm <- as.integer(Lcm(a@den, b@den))
+      lcm <- Lcm(a@den, b@den)
       simplify.expr_num(new("expr_frac", num = a@num * lcm %/% a@den +  b@num * lcm %/% b@den, den = lcm))
     } else {
       simplify.expr_num(new("expr_frac", num = a@num+b@num, den = a@den))
@@ -175,9 +175,13 @@ setClass("expr_sum", contains = "list", slots = c(num = "expr_num"), prototype =
 
 simplify.expr_num <- function(a) {
   if(is(a, "expr_frac")) {
-    div <- as.integer(gcd(a@num, a@den))
-    a@num <- a@num %/% div
-    a@den <- a@den %/% div
+    div <- gcd(a@num, a@den)
+    if(a@den %/% div > 1000) {
+      a <- new("expr_real", num = a@num/a@den)
+    } else {
+      a@num <- a@num %/% div
+      a@den <- a@den %/% div
+    }
   }
   a
 }
@@ -273,7 +277,7 @@ simplify_expr <- function(expr) {
     return(as(ret[vapply(ret, function(x) .as.numeric.expr_num(x@num) != 0, logical(1))], "expr_sum"))
   } else if(is.numeric(expr)) {
     if(expr %% 1 == 0) {
-      num <- new("expr_frac", num = as.integer(expr), den = 1L)
+      num <- new("expr_frac", num = expr, den = 1L)
     } else {
       num <- new("expr_real", num = expr)
     }
@@ -293,7 +297,7 @@ simplify_expr <- function(expr) {
       }
       if(is.numeric(expr[[2]])) {
         if(expr[[2]] %% 1 == 0 && expr[[3]] %% 1 == 0) {
-          num <- new("expr_frac", num = as.integer(expr[[2]]), den = as.integer(expr[[3]]))
+          num <- new("expr_frac", num = round(expr[[2]]), den = round(expr[[3]]))
         } else {
           num <- new("expr_real", num = expr[[2]]/expr[[3]])
         }
@@ -301,7 +305,7 @@ simplify_expr <- function(expr) {
       } else {
         lh <- simplify_expr(expr[[2]])
         if(expr[[3]] %% 1 == 0) {
-          num <- new("expr_frac", num = 1L, den = as.integer(expr[[3]]))
+          num <- new("expr_frac", num = 1L, den = expr[[3]])
         } else {
           num <- new("expr_real", num = 1/expr[[3]])
         }

@@ -353,11 +353,12 @@ hmat2expr <- function(hmat, as_fractions = TRUE) {
   ret <- lapply(seq_len(nrow(hmat)), function(j) {
     simplify_expr_sum(
       as(lapply(seq_len(ncol(hmat)), function(i) {
+        num <- new("expr_real", num = hmat[j,i])
         if(as_fractions) {
-          frac <- strsplit(attr(as.fractions(hmat[j,i]), "fracs"), "/", TRUE)[[1]]
-          num <- new("expr_frac", num = as.integer(frac[1]), den = if(length(frac)>1) as.integer(frac[2]) else 1L)
-        } else {
-          num <- new("expr_real", num = hmat[j,i])
+          frac <- as.numeric(strsplit(attr(as.fractions(hmat[j,i]), "fracs"), "/", TRUE)[[1]])
+          if(length(frac) == 2 && frac[2] <= 1000) {
+            num <- new("expr_frac", num = frac[1], den = if(length(frac)>1) frac[2] else 1L)
+          }
         }
         new("expr_coef", num = num, var = colnames(hmat)[i])
       }), "expr_sum")
@@ -1168,7 +1169,7 @@ filler_contrasts <- function(x, how.many = nlevels(x), rescale = TRUE) {
     qy <- qr.qy(q, diag(nrow(cm)))
     new_contrasts <- qy[,-seq_len(ncol(cm)),drop=FALSE]
     if(rescale) {
-      new_contrasts <- new_contrasts / rep(apply(new_contrasts, 2, minabsnz), nrow(qy)) * minabsnz(cm)
+      new_contrasts <- new_contrasts / rep(apply(new_contrasts, 2, minabsnz), nrow(qy)) * as.double(minabsnz(cm))
     }
     if(is.null(colnames(cm))) colnames(cm) <- c("Intercept", paste0("T", seq_len(ncol(cm)-1)))
     colnames(new_contrasts) <- paste0("F", seq_len(ncol(new_contrasts)))
