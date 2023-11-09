@@ -63,22 +63,20 @@ setClass("expr_sum", contains = "list", slots = c(num = "expr_num"), prototype =
   if(length(object) > 0) {
     # reformat
     if(length(object) > 1) {
-      div <- gcd(.as.numeric.expr_num(object[[1]]@num), .as.numeric.expr_num(object[[2]]@num))
-      for(i in seq_along(object)[c(-1,-2)]) {
-        div <- gcd(div, .as.numeric.expr_num(object[[i]]@num))
-      }
-      if(div != 1) {
-        if(div %% 1 == 0) {
-          object@num <- new("expr_frac", num = div)
-        } else {
-          frac <- as.numeric(strsplit(attr(fractions(div), "fracs"), "/", TRUE)[[1]])
-          if(length(frac) == 2 && all(frac < 1000)) {
-            object@num <- simplify.expr_num(new("expr_frac", num = frac[1], den = frac[2]))
-          }
+      if(all(vapply(object, \(x) is(x@num, "expr_frac"), logical(1)))) {
+        den_gcd <- gcd(object[[1]]@num@den, object[[2]]@num@den)
+        for(i in seq_along(object)[c(-1,-2)]) {
+          den_gcd <- gcd(den_gcd, object[[i]]@num@den)
+        }
+        num_gcd <- gcd(object[[1]]@num@num, object[[2]]@num@num)
+        for(i in seq_along(object)[c(-1,-2)]) {
+          num_gcd <- gcd(num_gcd, object[[i]]@num@num)
         }
         for(i in seq_along(object)) {
-          object[[i]]@num <- simplify.expr_num(`/.expr_num`(object[[i]]@num, object@num))
+          object[[i]]@num@num <- object[[i]]@num@num / num_gcd
+          object[[i]]@num@den <- object[[i]]@num@den / den_gcd
         }
+        object@num <- new("expr_frac", num = num_gcd, den = den_gcd)
       }
     }
 
